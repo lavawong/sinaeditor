@@ -1,14 +1,43 @@
 #summary One-sentence summary of this page.
 #labels Phase-Deploy
 
-= Introduction =
+= 自定义插件 =
 
-Add your content here.
+    当前开发的插件并不能满足所有的需求，所以有可能需要开发自定义的插件。
 
+=== 编写一个插件 ===
 
-= Details =
+    插件的编码形式如下：
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+    {{{
+        SinaEditor.plugins.add('plugin',function(args){
+            var editor = this;
+            
+            //plugin 代码...
+            
+            return {
+                'initialize':function(){
+                    //...插件初始化时执行的代码。
+                }
+                ,'events' : [
+                    //对应要绑定的元素
+                    'element':Element,
+                    'events' : {
+                        {eventName:function(){}}
+                        //...所有此元素要绑定的事件
+                    }
+                ]
+            }
+        });
+    }}}
+
+    插件的返回不是必须的，只是方便了您绑定的事件，*initialize*函数会对一个编辑器触发一次，如果在一个页面上有多个编辑器时则要考虑*initialize*中的全局变量。
+
+=== 完整的功能 ===
+
+    完全的功能一般最多由三个插件组成：
+        *按钮插件(_pluginUIBtn_)，用于激活插件的逻辑部分。按照约定，按钮存放于_editor_.btns._pluginUI_下。
+        *浮层插件(_pluginUIPanel_)，或者对话框。有可能在点击了按钮后，并不会迅速触发逻辑，而是在用户选择数据后进行真正的逻辑触发。按照约定，浮层会存放于_editor_.panels._pluginUI_下。
+        *逻辑插件(_plugin_)，实际需要操作的逻辑。按照约定，存放于_editor_.operation._plugin_下。
+
+    按钮，浮层都是必要的插件，如果需要，则是通过逻辑插件调用(_editor_.callPlugin)按钮插件和浮层插件实现联动的。
