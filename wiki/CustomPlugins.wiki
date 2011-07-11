@@ -36,8 +36,8 @@
 === 完整的功能 ===
 
     完全的功能一般最多由三个插件组成：
-        *按钮插件(_pluginUIBtn_)，用于激活插件的逻辑部分。按照约定，按钮存放于_editor_.btns._pluginUI_下。
-        *浮层插件(_pluginUIPanel_)，或者对话框。有可能在点击了按钮后，并不会迅速触发逻辑，而是在用户选择数据后进行真正的逻辑触发。按照约定，浮层会存放于_editor_.panels._pluginUI_下。
-        *逻辑插件(_plugin_)，实际需要操作的逻辑。按照约定，存放于_editor_.operation._plugin_下。
+        # 按钮插件(_pluginUIBtn_)，用于激活插件的逻辑部分。按照约定，按钮存放于_editor_.btns._pluginUI_下。
+        # 浮层插件(_pluginUIPanel_)，或者对话框。有可能在点击了按钮后，并不会迅速触发逻辑，而是在用户选择数据后进行真正的逻辑触发。按照约定，浮层会存放于_editor_.panels._pluginUI_下。
+        # 逻辑插件(_plugin_)，实际需要操作的逻辑。按照约定，存放于_editor_.operation._plugin_下。
 
     按钮，浮层都是必要的插件，如果需要，则是通过逻辑插件调用(_editor_.callPlugin)按钮插件和浮层插件实现联动的。
