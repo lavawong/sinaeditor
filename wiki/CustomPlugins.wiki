@@ -36,8 +36,66 @@
 === 完整的功能 ===
 
     完全的功能一般最多由三个插件组成：
-        # 按钮插件(_pluginUIBtn_)，用于激活插件的逻辑部分。按照约定，按钮存放于_editor_.btns._pluginUI_下。
-        # 浮层插件(_pluginUIPanel_)，或者对话框。有可能在点击了按钮后，并不会迅速触发逻辑，而是在用户选择数据后进行真正的逻辑触发。按照约定，浮层会存放于_editor_.panels._pluginUI_下。
-        # 逻辑插件(_plugin_)，实际需要操作的逻辑。按照约定，存放于_editor_.operation._plugin_下。
+        # 按钮插件(pluginUIBtn)，用于激活插件的逻辑部分。按照约定，按钮存放于_editor_.btns.pluginUI下。
+        # 浮层插件(pluginUIPanel)，或者对话框。有可能在点击了按钮后，并不会迅速触发逻辑，而是在用户选择数据后进行真正的逻辑触发。按照约定，浮层会存放于_editor_.panels.pluginUI下。
+        # 逻辑插件(plugin)，实际需要操作的逻辑。按照约定，存放于_editor_.operation.plugin下。
 
     按钮，浮层都是必要的插件，如果需要，则是通过逻辑插件调用(_editor_.callPlugin)按钮插件和浮层插件实现联动的。
+
+== helloworld ==
+
+    先来一个helloword的实例，当用户点击按钮后，弹出"helloworld"的提示。在/se/plugins/下创建helloworld.js的插件文件，代码非常的简单：
+{{{
+SinaEditor.plugins.add('helloworld',function(args){
+    var editor = this;
+    var btn = SinaEditor.ButtonFactory.createButton({
+        title:'弹出hello world',
+        //通常情况下的样式。
+        //这里的逻辑默认为显示源代码的情况下，按钮为不可点击。
+        //这里的样式可以在editor.css下添加
+        normalClass: 'ico_hello_1',
+        disabledClass: 'ico_hello_4',
+        clickedClass: 'ico_hello_3',
+        mouseoverClass: 'ico_hello_2',
+        state: SinaEditor.BUTTONSTATE.DISABLED,
+        //定义为自己的组
+        group: 'mine'
+    },editor);
+    //提供出按钮，方便其他插件可能的调用。
+    editor.btns.helloworldUI = btn;
+    return {
+        'events' : [
+            //对应要绑定的元素
+            'element':btn.$,
+            'events' : {
+                {
+                    'click':function(){
+                        //当按钮的状态不是可以点击时，不响应任何事件。
+                        if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
+                            return false;
+                        }
+                        alert('helloworld');
+                        return false;
+                    }
+                }
+            }
+        ]
+    }
+});
+}}}
+
+    这样就完成了一个插件的编写。
+
+=== 重新打包或者是直接添加 ===
+
+    如果插件会在多个页面同时使用，可以考虑把它打包到*sinaeditor.js*中。如果只是临时添加，可以在<script type="text/javascript" src="sinaeditor.js"></script>下添加此js文件即可绑定：
+
+
+`<script type="text/javascript" src="/se/plugins/helloworld.js"></script>`
+
+=== 如何在声明中使用此使用 ===
+
+   经过了上一步的操作，仅仅是在编辑器系统中添加了此插件，并没有实际应用到具体的编辑器中，您可以在创建编辑器时申明要调用此插件：
+{{{
+
+}}} 
