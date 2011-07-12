@@ -65,17 +65,19 @@ SinaEditor.plugins.add('helloworld',function(args){
     editor.btns.helloworldUI = btn;
     return {
         'events' : [
-            //对应要绑定的元素
-            'element':btn.$,
-            'events' : {
-                {
-                    'click':function(){
-                        //当按钮的状态不是可以点击时，不响应任何事件。
-                        if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
+            {
+                //对应要绑定的元素
+                'element':btn.$,
+                'events' : {
+                    {
+                        'click':function(){
+                            //当按钮的状态不是可以点击时，不响应任何事件。
+                            if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
+                                return false;
+                            }
+                            alert('helloworld');
                             return false;
                         }
-                        alert('helloworld');
-                        return false;
                     }
                 }
             }
@@ -93,9 +95,16 @@ SinaEditor.plugins.add('helloworld',function(args){
 
 `<script type="text/javascript" src="/se/plugins/helloworld.js"></script>`
 
-=== 如何在声明中使用此使用 ===
+=== 如何在声明中使用此插件 ===
 
    经过了上一步的操作，仅仅是在编辑器系统中添加了此插件，并没有实际应用到具体的编辑器中，您可以在创建编辑器时申明要调用此插件：
-{{{
 
-}}} 
+{{{
+"plugns": [
+//...其他插件
+{"name": "helloworld"}
+//...其他插件
+]
+}}}
+
+这样，我们就可以看到效果了[]
