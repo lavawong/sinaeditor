@@ -57,6 +57,7 @@ SinaEditor.plugins.add('helloworld',function(args){
         disabledClass: 'ico_hello_4',
         clickedClass: 'ico_hello_3',
         mouseoverClass: 'ico_hello_2',
+        properties : {'innerHTML':'H'},
         state: SinaEditor.BUTTONSTATE.DISABLED,
         //定义为自己的组
         group: 'mine'
@@ -69,15 +70,13 @@ SinaEditor.plugins.add('helloworld',function(args){
                 //对应要绑定的元素
                 'element':btn.$,
                 'events' : {
-                    {
-                        'click':function(){
-                            //当按钮的状态不是可以点击时，不响应任何事件。
-                            if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-                                return false;
-                            }
-                            alert('helloworld');
+                    'click':function(){
+                        //当按钮的状态不是可以点击时，不响应任何事件。
+                        if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
                             return false;
                         }
+                        alert('helloworld');
+                        return false;
                     }
                 }
             }
