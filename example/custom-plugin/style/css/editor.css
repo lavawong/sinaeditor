@@ -3,6 +3,7 @@
 .pro_tools .ico_showsrc_3{background-color: #00FF00; margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_showsrc_4{background-color: #00FF00; margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 
+
 /****************** 编辑器专有样式 *********************/
 
 .se_fontfamily_bubble {
@@ -402,7 +403,7 @@
 
 /* 各种浮层 */
 .fontItemContent { position: absolute; width: 162px; border: 1px solid #C6C6C6; background-color: #F4F4F4;  }
-.fontItemTitle { width: 152px; height: 25px; line-height: 25px; background-image: url(../imgs/editor_bg.gif); background-position: -320px -458px; text-align: left; padding-left: 10px; font-weight: bold; }
+.fontItemTitle { width: 152px; height: 25px; line-height: 25px; background-color: #AACCFF; text-align: left; padding-left: 10px; font-weight: bold; }
 .fontItem { cursor:pointer;display: block; text-decoration:none; text-align:center; padding: 4px; border: 1px solid #C6C6C6; margin: 2px; color: #000; font-family: "宋体" }
 .fontItem:link,
 .fontItem:visited{ color:#333}
