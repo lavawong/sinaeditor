@@ -27,8 +27,12 @@ SinaEditor.CONF.bubbleStyles = ['.se_bubble {',
 '}'].join('');
 SinaEditor.CONF.bubbleClassName = 'se_bubble';
 
-SinaEditor.CONF.transparentIMG = "http://test.sina.com.cn/editor/style/imgs/SG_line.gif";
-SinaEditor.CONF.fakeFLASH = "http://test.sina.com.cn/editor/style/imgs/fake_flash.png";
+//需要在这里指明路径,下面的两句就可以不要了。
+var href = window.location.href;
+var loc = href.substring(0,href.lastIndexOf('/'));
+SinaEditor.CONF.STYLELOC = loc+'/style/';
+SinaEditor.CONF.transparentIMG = SinaEditor.CONF.STYLELOC+"imgs/SG_line.gif";
+SinaEditor.CONF.fakeFLASH = SinaEditor.CONF.STYLELOC+"imgs/fake_flash.png";
 
 //链接点击后弹出的URL
 SinaEditor.CONF.aBubbleTemplete = ['<div class="se_bubble_a_panel">',
@@ -92,8 +96,7 @@ SinaEditor.CONF.flashBubbleTemplete = ['<div class="se_bubble_a_panel">',
 											'</span>',
 											'<div style="border:1px solid;display:none;" id="#{showflash}"></div>',
 										'</div>',
-										//TODO 关闭按钮的图片
-										'<img id="#{closeid}" src="/blog/style/imgs/bubble_closebox.gif" style="padding:3px;float:left;">',
+										'<img id="#{closeid}" src="',SinaEditor.CONF.STYLELOC,'imgs/bubble_closebox.gif" style="padding:3px;float:left;">',
 									'</div>',
 								'</div>'].join('');
 
@@ -375,11 +378,12 @@ SinaEditor.TOOLCONF.imgTemplate = ['<div class="insetPhotoContent insetPhotoCont
 		'<div id="#{clientView}">',
 			'<span>选择本地图片：</span>',
 			'<div id="#{clientUploadDiv}" class="clientUploadDiv" >',
-				'<form target="#{clientIframe}" id="#{clientForm}" action="http://hiphone.sinaapp.com/postImg.php" method="POST" enctype="multipart/form-data">',
+				//TODO 这里需要配置上传的地址。
+				'<form target="#{clientIframe}" id="#{clientForm}" action="postImg.php" method="POST" enctype="multipart/form-data">',
 					'<input type="file" name="imgFile" class="imgFile" id="#{clientFile}">',
 					'<textarea name="imgValue" style="display:none" id="#{clientFileDrag}"></textarea>',
 				'</form>',
-				'<div>点击这里选择文件。<span id="#{clientMoreUp}" style="display:none;">你也可以拖拽上传</span></div>',
+				'<div>点击这里选择文件。请配置上传地址，否则上传会失败。<span id="#{clientMoreUp}" style="display:none;">你也可以拖拽上传</span></div>',
 			'</div>',
 			'<iframe id="#{clientIframe}" name="#{clientIframe}" style="display:none" ></iframe>',
 		'</div>',

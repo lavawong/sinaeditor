@@ -59,7 +59,7 @@ SinaEditor.plugins.add('pasteFilter', function(args){
     var exChangeObject = function(objects){
         var img, i = 0;
         while (objects[i]) {
-            img = SinaEditor.util.dom.createDomFromHTML('<img src="'+transparentIMG+'" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(objects[i])) + '" width="' + objects[i].width + '" height="' + objects[i].height + '" style="background:url(\''+SinaEditor.CONF.fakeFLASH+'\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
+            img = SinaEditor.util.dom.createDomFromHTML('<img src="'+SinaEditor.CONF.transparentIMG+'" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(objects[i])) + '" width="' + objects[i].width + '" height="' + objects[i].height + '" style="background:url(\''+SinaEditor.CONF.fakeFLASH+'\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
             objects[i].parentNode.replaceChild(img, objects[i]);
         }
     };

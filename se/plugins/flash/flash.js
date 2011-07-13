@@ -26,7 +26,7 @@ SinaEditor.plugins.add('flashUI', function(args){
         if (typeof node === 'string') {
             node = SinaEditor.util.dom.createDomFromHTML(node, editor.entyDoc);
         }
-        var img = SinaEditor.util.dom.createDomFromHTML('<img src="' + transparentIMG + '" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(node)) + '" width="' + (node.width || 480) + '" height="' + (node.height || 370) + '" style="background:url(\'' + SinaEditor.CONF.fakeFLASH + '\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
+        var img = SinaEditor.util.dom.createDomFromHTML('<img src="' + SinaEditor.CONF.transparentIMG + '" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(node)) + '" width="' + (node.width || 480) + '" height="' + (node.height || 370) + '" style="background:url(\'' + SinaEditor.CONF.fakeFLASH + '\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
         editor.operation.addNode(img, focus);
     };
 });
