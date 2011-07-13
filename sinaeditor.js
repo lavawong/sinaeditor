@@ -378,11 +378,12 @@ SinaEditor.TOOLCONF.imgTemplate = ['<div class="insetPhotoContent insetPhotoCont
 		'<div id="#{clientView}">',
 			'<span>选择本地图片：</span>',
 			'<div id="#{clientUploadDiv}" class="clientUploadDiv" >',
-				'<form target="#{clientIframe}" id="#{clientForm}" action="http://hiphone.sinaapp.com/postImg.php" method="POST" enctype="multipart/form-data">',
+				//TODO 这里需要配置上传的地址。
+				'<form target="#{clientIframe}" id="#{clientForm}" action="postImg.php" method="POST" enctype="multipart/form-data">',
 					'<input type="file" name="imgFile" class="imgFile" id="#{clientFile}">',
 					'<textarea name="imgValue" style="display:none" id="#{clientFileDrag}"></textarea>',
 				'</form>',
-				'<div>点击这里选择文件。<span id="#{clientMoreUp}" style="display:none;">你也可以拖拽上传</span></div>',
+				'<div>点击这里选择文件。请配置上传地址，否则上传会失败。<span id="#{clientMoreUp}" style="display:none;">你也可以拖拽上传</span></div>',
 			'</div>',
 			'<iframe id="#{clientIframe}" name="#{clientIframe}" style="display:none" ></iframe>',
 		'</div>',
@@ -8247,6 +8248,24 @@ SinaEditor.plugins.add('showSourceBtn',function(args){
             }
         }]
     };
+});
+//获取最终编辑的内容
+SinaEditor.plugins.add('submit',function(args){
+	var editor = this;
+	
+	/**
+	 * 获取最终编辑的内容
+	 * @return {String} 最终的html字符串
+	 */
+	editor.operation.submit = function(){
+		var str = '',
+			filter = editor.operation.pasteFilter || function(){};
+			swapData = editor.operation.swapData || function(){};
+		swapData(true);
+		str = editor.entyArea.value;
+		swapData(false);
+		return str;
+	};
 });
 //插入表格
 SinaEditor.plugins.add('tableUI',function(args){
