@@ -27,8 +27,12 @@ SinaEditor.CONF.bubbleStyles = ['.se_bubble {',
 '}'].join('');
 SinaEditor.CONF.bubbleClassName = 'se_bubble';
 
-SinaEditor.CONF.transparentIMG = "http://test.sina.com.cn/editor/style/imgs/SG_line.gif";
-SinaEditor.CONF.fakeFLASH = "http://test.sina.com.cn/editor/style/imgs/fake_flash.png";
+//需要在这里指明路径,下面的两句就可以不要了。
+var href = window.location.href;
+var loc = href.substring(0,href.lastIndexOf('/'));
+SinaEditor.CONF.STYLELOC = loc+'/style/';
+SinaEditor.CONF.transparentIMG = SinaEditor.CONF.STYLELOC+"imgs/SG_line.gif";
+SinaEditor.CONF.fakeFLASH = SinaEditor.CONF.STYLELOC+"imgs/fake_flash.png";
 
 //链接点击后弹出的URL
 SinaEditor.CONF.aBubbleTemplete = ['<div class="se_bubble_a_panel">',
@@ -92,8 +96,7 @@ SinaEditor.CONF.flashBubbleTemplete = ['<div class="se_bubble_a_panel">',
 											'</span>',
 											'<div style="border:1px solid;display:none;" id="#{showflash}"></div>',
 										'</div>',
-										//TODO 关闭按钮的图片
-										'<img id="#{closeid}" src="/blog/style/imgs/bubble_closebox.gif" style="padding:3px;float:left;">',
+										'<img id="#{closeid}" src="',SinaEditor.CONF.STYLELOC,'imgs/bubble_closebox.gif" style="padding:3px;float:left;">',
 									'</div>',
 								'</div>'].join('');
 
@@ -441,6 +444,11 @@ SinaEditor.TOOLCONF.tableTemplate = ['<div id="#{panel}" class="se_tab_tableCont
 '</div>'].join('');
 
 SinaEditor.TOOLCONF.faceTemplate = '<div class="se_face_bubble" id="#{panel}"></div>';
+
+// ==ClosureCompiler==
+// @output_file_name default.js
+// @compilation_level SIMPLE_OPTIMIZATIONS
+// ==/ClosureCompiler==
 
 SinaEditor.TOOLCONF.faceSrc = [
 	{'src':'http://www.sinaimg.cn/uc/myshow/blog/misc/gif/E___7400ZH00SIGG.gif' , 'title':'左哼哼'},
@@ -3810,11 +3818,7 @@ SinaEditor.$abstract.Storage = (function(){
 	} else {
 		saveObj = document.createElement('div');
 		saveObj.addBehavior("#default#userData");
-		if(document.body) {
-			document.body.appendChild(saveObj);
-		} else {
-			document.getElementsByTagName('head')[0].appendChild(saveObj);
-		}
+		document.body.appendChild(saveObj);
 		saveObj.load('SinaEditor');
 		
 		proxyObj.setItem = function(key,value) {
@@ -5563,7 +5567,7 @@ SinaEditor.plugins.add('flashUI', function(args){
         if (typeof node === 'string') {
             node = SinaEditor.util.dom.createDomFromHTML(node, editor.entyDoc);
         }
-        var img = SinaEditor.util.dom.createDomFromHTML('<img src="' + transparentIMG + '" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(node)) + '" width="' + (node.width || 480) + '" height="' + (node.height || 370) + '" style="background:url(\'' + SinaEditor.CONF.fakeFLASH + '\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
+        var img = SinaEditor.util.dom.createDomFromHTML('<img src="' + SinaEditor.CONF.transparentIMG + '" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(node)) + '" width="' + (node.width || 480) + '" height="' + (node.height || 370) + '" style="background:url(\'' + SinaEditor.CONF.fakeFLASH + '\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
         editor.operation.addNode(img, focus);
     };
 });
@@ -7044,7 +7048,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
 	            'ownerDocument': editor.entyDoc,
 	            'attributes': {
 					'type':'text/javascript',
-	                'src':'http://ierange.googlecode.com/files/ierange-m2-packed.js'
+	                'src':'http://test.sina.com.cn/editor/ierange-m2.js'
 	            }
 	        });
 			
@@ -7937,7 +7941,7 @@ SinaEditor.plugins.add('pasteFilter', function(args){
     var exChangeObject = function(objects){
         var img, i = 0;
         while (objects[i]) {
-            img = SinaEditor.util.dom.createDomFromHTML('<img src="'+transparentIMG+'" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(objects[i])) + '" width="' + objects[i].width + '" height="' + objects[i].height + '" style="background:url(\''+SinaEditor.CONF.fakeFLASH+'\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
+            img = SinaEditor.util.dom.createDomFromHTML('<img src="'+SinaEditor.CONF.transparentIMG+'" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(objects[i])) + '" width="' + objects[i].width + '" height="' + objects[i].height + '" style="background:url(\''+SinaEditor.CONF.fakeFLASH+'\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
             objects[i].parentNode.replaceChild(img, objects[i]);
         }
     };
