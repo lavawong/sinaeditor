@@ -106,4 +106,6 @@ SinaEditor.plugins.add('helloworld',function(args){
 ]
 }}}
 
-这样，我们就可以看到效果了[]
+这样，我们就可以看到效果了[http://sinaeditor.googlecode.com/svn/example/wiki-pic/custom-plugin01.jpg]。测试页面在[http://sinaeditor.googlecode.com/svn/example/custom-plugin/helloworld.html 这里]。
+
+点击了按钮后，就会弹出提示，至此，自定义的插件就完成了。
