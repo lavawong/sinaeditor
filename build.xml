@@ -13,16 +13,14 @@
 			<fileset dir="${src.dir}/core/init/range/" includes="*.js"/>
 			<!-- 初始化事件资源 -->
 			<fileset file="${src.dir}/customevent/*.js" />
-			<!-- 初始化抽象资源 -->
+			<!-- 初始化抽象类资源 -->
 			<fileset file="${src.dir}/core/abstract/base/*.js" />
-			<!-- 初始化插件资源 -->
 			<fileset file="${src.dir}/core/abstract/*.js" />
+			<!-- 初始化插件资源 -->
 			<!--<fileset file="${src.dir}/plugins/*.js" />-->
-			<!-- 想个办法解决这里 -->
 			<fileset dir="${src.dir}">
 				<include name="plugins/**/*.js" />
 			</fileset>
-			<!-- 想个办法解决这里 -->
 			<!-- 初始化实例类  -->
 			<fileset file="${src.dir}/core/abstract/baseEditor.js" />
 			
@@ -36,10 +34,6 @@
 			<fileset file="${src.dir}/core/_enty/dialog/*.js" />
 			<fileset file="${src.dir}/core/_enty/dialog/config/moduleDialog.js" />
 			<fileset file="${src.dir}/core/_enty/dialog/config/dialogConfig.js" />
-			<!--
-				<filelist dir="${docbook.dir}/sections"
-					files="introduction.xml,overview.xml"/>
-			--> 
 		</concat>
 	</target>
 	
@@ -49,10 +43,3 @@
 		</delete>
 	</target>
 </project>
-
-<!--
-调用本地方法
-<exec executable="ant">  
-	<arg  line=" -classpath   ${myclasspath}   HelloWorld"   />  
-</exec>
--->
