@@ -1,0 +1,32 @@
+#summary 目前编辑器中可用的操作列表
+
+||所在插件的名称||操作的function||传递的参数||作用||查询状态使用的id||
+||backcolor||backcolor||{String} color 要修改的文字背景颜色。|| 修改文字的背景颜色|| backcolor 返回{String}当前的背景颜色值||
+||bold||bold||无||加粗或者取消加粗文字(加粗时使用strong标签添加，取消加粗时是去strong标签和b标签，这里没有对样式的加粗做去除，即有可能出现失效的情况。)||bold 返回boolean，是否加粗||
+||addFace||addFace|| {String} src 要添加表情的图片地址|| 添加表情 || 无||
+||flashUI||insertFlash|| 1.{String | Element} node 当前的节点html字符串，或者是节点。<br>2.{Boolean} focus 是否选中添加的flash||添加flash节点||无||
+||fontFamily||fontFamily||{String} fontFamily 要设置的字体值||对选中的文字设置字体||fontFamily 返回{String} 当前选中的文字的值||
+||fontSize||fontSize||{String} fontSize 要设置的字体大小||对选中的文字设置文字大小||fontSize 返回{String} 当前选中的文字的字体大小值||
+||forecolor||forecolor||{String} color 要修改的文字背景颜色。||修改文字的颜色||forecolor 返回{String} 当前选中的文字的颜色值||
+||historyUI||saveData||无，返回boolean，是否保存成功||保存当前的文本内容到本地存储,每10分钟自动保存一次。||无||
+||historyUI||loadData||{Integer} time 获取的对应时间 或者 不传递参数。 <br><br>返回{String} 保存指定时间保存的内容(不传递参数为最后保存的内容)||保存指定时间保存的内容(不传递参数为最后保存的内容)||无||
+||historyUI||putData||{integer} time 要放入的时间，如果没有传递，则放入当前时间。||把存储的内容放入到编辑器内。||无||
+||indent||indent||无||增加缩进||无||
+||italic||italic||无||倾斜字体，或者取消倾斜字体||italic <br>返回booelan,判断是否已经是倾斜字体||
+||justifycenter||justifycenter||无||文本居中显示||无||
+||justifyleft||justifyleft||无||文本居左显示||无||
+||justifyright||justifyright||无||文本居右显示||无||
+||link||link||{Object} opt_obj 包含多种可选参数：<br>{<br>link:链接<br>str:文字<br>range:当前的选区<br>elm:传递的节点，一定是A标签，如果包含有link，那么则替换elm的地址，没有，那么删除A标签的地址}<br>||添加链接或删除链接，根据参数传递的情况决定如何操作：<br>1.有选中文字：首先会清理掉里面所有的A标签<br>    a.不传递：检测选区中的a标签，全部清除。<br>    b.传递link：选区包裹上以A标签作为链接。<br>    c.传递link,str：忽略str,同操作1b。<br>2.没有选中文字：<br>    a.不传递：不做任何操作。<br>    b.传递link:以link作为str来生成链接<br>    c.传递link,str:添加链接。||无||
+||markList||markList||无||添加项目符号(添加ul标签,无序项目符号)||无||
+||numberList||numberList||无||添加项目符号(添加ol标签,有序项目符号)||无||
+||outdent||outdent||无||减少缩进||无||
+||redoManager||redo||无||重做刚才撤销的操作。||无||
+||redoManager||undo||无||撤销刚才的操作。||无||
+||redoManager||save||无||记录刚才的操作。||无||
+||redoManager||clearRU||无||清理所有的历史记录信息。||无||
+||showSource||swapData||{Boolean} toArea true时为从iframe到textarea||查看源代码。或者把源代码迁移到iframe中||无||
+||tableUI||tableCreate||{Interget} x 行数<br>{Interget} y 列数<br>||创建一个指定大小的table元素||无||
+||underline||underline||无||添加下划线，或者取消下划线||underline 返回是否有下划线||
+||addContent||addNode||{Element} node 要添加的节点。<br>{Booelan} focus 是否把焦点集中到新添的节点中||添加一个节点||无||
+||addContent||addContent||{String} str 要添加的字符串。<br>{Booelan} focus 是否把焦点集中到新添的节点中||添加字符串到编辑器内||无||
+||pasteFilter||pasteFilter||,,无,,#1||对粘贴的内容进行过滤||无||
