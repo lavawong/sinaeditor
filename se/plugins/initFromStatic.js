@@ -72,7 +72,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
 	            'ownerDocument': editor.entyDoc,
 	            'attributes': {
 					'type':'text/javascript',
-	                'src':'http://test.sina.com.cn/editor/ierange-m2.js'
+	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+(+new Date())
 	            }
 	        });
 			
