@@ -95,7 +95,12 @@ SinaEditor.$abstract.Storage = (function(){
 	} else {
 		saveObj = document.createElement('div');
 		saveObj.addBehavior("#default#userData");
-		document.body.appendChild(saveObj);
+		if(document.body) {
+			document.body.appendChild(saveObj);
+		} else {
+			//在head中引用，body有可能还没有被初始化
+			document.getElementsByTagName('head')[0].appendChild(saveObj);
+		}
 		saveObj.load('SinaEditor');
 		
 		proxyObj.setItem = function(key,value) {
