@@ -14,7 +14,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 	var _queryStateArr = {};
 
     var _createRange = function(editor){
-        return editor.entyDoc.createRange();
+        return editor.entyDoc.createRange(true);
     };
     
     /**
@@ -217,8 +217,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			case SinaEditor.NODETYPE.TEXT : 
 				console.log('SinaEditor.NODETYPE.TEXT');
 				var parent = referNode.parentNode;
-				//有可能被拆卸了
-				parent.normalize();
+				try {
+					//有可能被拆卸了
+					parent.normalize();
+				}  catch(e){}
 				if(parent.childNodes.length == 1) {
 					return parent;
 				}
@@ -342,32 +344,36 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
     ns.applyStyle = function(editor, styleConf){
         styleConf.useTagName = styleConf.useTagName || 'span';
         var range = ns.getCurrentRanges(editor.entyWin)[0];
-		editor.entyDoc.normalize();
+
+		try {
+			editor.entyDoc.normalize();
+		} catch(e){}
 
 		if (range.collapsed) {
 			var elm = null;
 			var startContainer = range.startContainer;
 			//注意，最后那个不是空字符串。是一个0宽度的空格
-			if(startContainer.nodeType === SinaEditor.NODETYPE.ELEMENT 
-				//&& startContainer.tagName.toUpperCase() === styleConf['useTagName'].toUpperCase() 
-				&& startContainer.tagName.toUpperCase() === styleConf.useTagName.toUpperCase()
-				&& startContainer.innerHTML === '​') {
+			if (startContainer.nodeType === SinaEditor.NODETYPE.ELEMENT //&& startContainer.tagName.toUpperCase() === styleConf['useTagName'].toUpperCase() 
+			&&
+			startContainer.tagName.toUpperCase() === styleConf.useTagName.toUpperCase() &&
+			startContainer.innerHTML === '​') {
 				//重复的选取
 				elm = startContainer;
-			} else {
+			}
+			else {
 				//elm = domUtil.createDom(styleConf['useTagName'], {
 				elm = domUtil.createDom(styleConf.useTagName, {
-	                'ownerDocument': editor.entyDoc
-	            });
+					'ownerDocument': editor.entyDoc
+				});
 				elm.innerHTML = '&#x200b;';
 				range.insertNode(elm);
 			}
 			
-            //if (styleConf['style']) {
+			//if (styleConf['style']) {
 			if (styleConf.style) {
-                //elm.style[styleConf['style']] = styleConf['value'];
+				//elm.style[styleConf['style']] = styleConf['value'];
 				elm.style[styleConf.style] = styleConf.value;
-            }
+			}
 			range.selectNodeContents(elm);
 			range.collapse(false);
 			ns.applyRanges(editor.entyWin, range);
@@ -378,6 +384,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		var marks = _createBookmark(editor, {
             'range': range
         });
+		
 		//拆分块状元素，判断放在了函数里
         if(marks.end){
 			_breakParent.call(editor, marks.end);
@@ -510,8 +517,9 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         });
         
         //if (range.toString()) {
-        
-			editor.entyDoc.normalize();
+			try {
+				editor.entyDoc.normalize();
+			} catch(e){}
 			
 			if(!noBreak) {
 				//拆分块状元素，判断放在了函数里
@@ -590,10 +598,15 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         while (!nextEl) {
             nextEl = elm.parentNode;
             //父节点肯定有tagName
-            if (nextEl.tagName.toUpperCase() == 'HTML') {
-                //到达了最高级
-                throw '确定在遍历节点时有结束标记的节点?';
-            }
+			try{
+				//[TODO] 为破IE加的try
+				if (nextEl.tagName.toUpperCase() == 'HTML') {
+	                //到达了最高级
+	                throw '确定在遍历节点时有结束标记的节点?';
+	            }
+			} catch(e){
+				debugger;
+			}
             //鸡肋
             elm = nextEl;
             nextEl = elm.nextSibling;
@@ -608,12 +621,15 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      */
     var _createBookmark = function(editor, opts){
         opts = opts || {};
-        var spanHead;
-        var spanEnd;
+        var spanHead,
+			spanEnd,
+			clone;
         spanHead = domUtil.createDom('span', {
             'ownerDocument': editor.entyDoc,
             properties: {
+				'id':'start',
                 'innerHTML': '&nbsp;'
+				//'innerHTML': '开始'
             },
             attributies: {
                 '_se_mark': 1
@@ -624,11 +640,12 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         
         opts.range = opts.range || _createRange(editor);
         
-        if (!opts.range.collapsed) {
+        //if (!opts.range.collapsed) {
             //有选中
             spanEnd = domUtil.createDom('span', {
                 'ownerDocument': editor.entyDoc,
                 properties: {
+					'id':'end',
                     'innerHTML': '&nbsp;'
 					//'innerHTML': '结束'
                 },
@@ -638,24 +655,30 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
             });
             //spanEnd.style.display = 'none';
 			spanEnd.style.color = '#FF0000';
-            var clone = opts.range.cloneRange();
-            clone.collapse(false);
-            clone.insertNode(spanEnd);
+			if(!opts.range._document) {
+				clone = opts.range.cloneRange();
+	            clone.collapse(false);
+	            clone.insertNode(spanEnd);
+				clone = opts.range.cloneRange();
+		        clone.collapse(true);
+		        clone.insertNode(spanHead);
+			} else {
+				var dup = opts.range._range.duplicate();
+				dup.collapse(true);
+				dup.pasteHTML(spanHead.outerHTML);
+				dup = opts.range._range.duplicate();
+				dup.collapse(false);
+				dup.pasteHTML(spanEnd.outerHTML);
+				spanHead = opts.range._document.getElementById('start');
+				spanEnd = opts.range._document.getElementById('end');
+			}
+            
             //clone.detach();
-        }
-        clone = opts.range.cloneRange();
-        clone.collapse(true);
-        clone.insertNode(spanHead);
+        //}
         //clone.detach();
         
-        if (spanEnd) {
-            opts.range.setStartAfter(spanHead);
-            opts.range.setEndBefore(spanEnd);
-        }
-        else {
-            opts.range.setStartAfter(spanHead);
-            opts.range.collapse(true);
-        }
+        opts.range.setStartAfter(spanHead);
+        opts.range.setEndBefore(spanEnd);
         
         ns.applyRanges(editor.entyWin, opts.range);
         
@@ -716,7 +739,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         //if (parent.tagName.toUpperCase() == conf['useTagName']) {
 		if (parent.tagName.toUpperCase() === conf.useTagName) {
             console.log("它的父节点是span!");
-            if (SinaEditor.util.trim(parent.textContent) != SinaEditor.util.trim(element.data)) {
+            if (SinaEditor.util.trim(parent.textContent || parent.innerText) != SinaEditor.util.trim(element.data)) {
                 range.selectNode(element);
                 range.surroundContents(span);
                 return span;
@@ -751,7 +774,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 				if (pParent && pParent.nodeType === SinaEditor.NODETYPE.ELEMENT 
 					&& pParent.tagName.toUpperCase() == conf.useTagName) {
                     console.log("它的父节点的父节点是span");
-                    if (SinaEditor.util.trim(pParent.textContent) == SinaEditor.util.trim(element.data)) {
+                    if (SinaEditor.util.trim(parent.textContent || parent.innerText) == SinaEditor.util.trim(element.data)) {
                         //if (conf['style']) {
 						if (conf.style) {
                             //pParent.style[conf['style']] = conf['value'];
@@ -768,7 +791,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                 else {
                     console.log("它的父节点的父节点不是span，是:");
                     console.log(pParent);
-                    if (SinaEditor.util.trim(parent.textContent) == SinaEditor.util.trim(element.data)) {
+                    if (SinaEditor.util.trim(parent.textContent || parent.innerText) == SinaEditor.util.trim(element.data)) {
                         //全部选中
                         range.selectNode(parent);
                     }
