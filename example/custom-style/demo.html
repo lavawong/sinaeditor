@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>演示</title>
+		<link type="text/css" rel="stylesheet" media="all" href="http://sinaeditor.googlecode.com/svn/tags/SinaEditor_0.9/style/css/panel.css" />
+		<link type="text/css" rel="stylesheet" href="http://sinaeditor.googlecode.com/svn/tags/SinaEditor_0.9/style/css/editor.css" />
+
+		<style>
+			.enty-editor {
+				border:1px solid;height:200px;
+			}
+			.editor-btn {
+				width:38px;height:38px;position:absolute;border:1px solid #000;
+			}
+			.editor-btn div {
+				width:36px;height:36px;background:#000;border:1px solid #FFF;zoom:1;color:#fff;
+			}
+			#strangeEditor {
+				height:600px;background: url('bg.jpg') repeat scroll 0 0 transparent;position: relative;width:auto;
+			}
+			.clear {
+				clear:both;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main">
+			<div id="strangeEditor">
+				<div style="top:89px;left:102px;" class="editor-btn" id="backcolor" title="文字背景色">
+					<div></div>
+				</div>
+				<div style="top:545px;left:94px;" class="editor-btn" id="bold" title="加粗">
+					<div></div>
+				</div>
+				<div style="top:541px;left:234px;" class="editor-btn" id="underline" title="下划线">
+					<div></div>
+
+				</div>
+				<div style="top:447px;left:675px;" class="editor-btn" id="forecolor" title="文字颜色">
+					<div></div>
+				</div>
+				<div style="top:253px;left:828px;" class="editor-btn" id="imgUI" title="上传图片">
+					<div></div>
+				</div>
+				<div style="top:143px;left:761px;" class="editor-btn" id="flashUI" title="插入flash">
+					<div></div>
+
+				</div>
+				<div style="top:51px;left:585px;" class="editor-btn" id="tableUI" title="插入表格">
+					<div></div>
+				</div>
+				<div style="width:500px;margin:0 auto;padding-top:200px;">
+					<div id="frame" class="enty-editor"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+
+			<div id="myEnty"></div>
+			<div class="pro_tools" id="testSaveButtons"></div>
+		</div>
+		
+		<div class="footer">
+			SINA INC.
+		</div>
+		<script type="text/javascript" src="http://sinaeditor.googlecode.com/svn/tags/SinaEditor_0.9/sinaeditor_min.js"></script>
+		<script type="text/javascript" src="jquery-1.6.1.min.js"></script>
+
+		<script type="text/javascript" src="demo-strange.js"></script>
+		<script type="text/javascript">
+			if(!window.console) {
+				window.consoel = {};
+				consoel.log = function(){};
+				consoel.error = function(){};
+			}
+            window.onload = function(){
+                var config = {
+                    "id": "myEditorStrange",
+                    //编辑器的按钮存放的base dom id 或者dom
+                    "toolBase": 'testSaveButtons',
+                    "initType": {
+                        "name": "initFromStatic",
+                        "args": {
+                            "parent": document.getElementById('frame')
+                        }
+                    },
+                    //可选
+                    "filter": {
+                        "name": "pasteFilter",
+                        "args": {
+                            "tagName": "SCRIPT|INPUT|IFRAME|TEXTAREA|SELECT|BUTTON",
+                            "noFlashExchange": false,
+                            "attribute": "id"
+                        }
+                    },
+                    "editorName": 'SinaEditor._.entyimpl.normalEditor',
+                    "styles": "body {\
+									margin:0px;\
+									padding:0px;\
+									width:100%;\
+									height:100%;\
+								}\
+								.biaoqing {\
+									width:22px;\
+									height:22px;\
+								}",
+                    "styleLinks": ["http://sinaeditor.googlecode.com/svn/tags/SinaEditor_0.9/style/css/contents.css"],
+                    "plugns": [{
+                        "name": "addContent",
+                    },{
+                        "name": "backcolor",
+						'args' : {
+							'btnConf' : {
+								'noEvent' : true,
+								'btnType' : 'custom',
+								"entyBtn": document.getElementById('backcolor')
+							}
+						}
+                    },{
+                        "name": "forecolor",
+						'args' : {
+							'btnConf' : {
+								'noEvent' : true,
+								'btnType' : 'custom',
+								"entyBtn": document.getElementById('forecolor')
+							}
+						}
+                    }, {
+                        "name": "underline",
+						'args' : {
+							'btnConf' : {
+								'noEvent' : true,
+								'btnType' : 'custom',
+								"entyBtn": document.getElementById('underline')
+							}
+						}
+                    },{
+                        "name": "bold",
+						'args' : {
+							'btnConf' : {
+								'noEvent' : true,
+								'btnType' : 'custom',
+								"entyBtn": document.getElementById('bold')
+							}
+						}
+                    }, {
+                        "name": "linkBubble"
+                    }, {
+                        "name": "imgBubble"
+                    }, {
+                        "name": "flashBubble"
+                    }, {
+                        "name": "redoManager",
+						'args' : {
+							'customerBtnR' : true,
+							'customerBtnU' : true
+						}
+                    }, {
+                        "name": "imgUI",
+						'args' : {
+							'btnConf' : {
+								'noEvent' : true,
+								'btnType' : 'custom',
+								"entyBtn": document.getElementById('imgUI')
+							}
+						}
+                    }, {
+                        "name": "flashUI",
+						'args' : {
+							'btnConf' : {
+								'noEvent' : true,
+								'btnType' : 'custom',
+								"entyBtn": document.getElementById('flashUI')
+							}
+						}
+                    }, {
+                        "name": "tableUI",
+						'args' : {
+							'btnConf' : {
+								'noEvent' : true,
+								'btnType' : 'custom',
+								"entyBtn": document.getElementById('tableUI')
+							}
+						}
+                    }]
+                };
+
+                window.editor1 = SinaEditor.createEditor(config);
+            }
+        </script>
+	</body>
+</html>
