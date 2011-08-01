@@ -286,10 +286,15 @@ SinaEditor.plugins.add('imgUIPanel',function(args){
             "element": clientUploadDiv,
             "events": {
 				'mousemove' : function(e) {
-					var pos = SinaEditor.util.dom.getXY(clientUploadDiv);
-					var scroll = SinaEditor.util.dom.getScrollPos();
-					clientFile.style.left = (e.clientX - pos[0] - 10 + scroll[1]) + 'px';
-					clientFile.style.top = (e.clientY - pos[1] -15 + scroll[0]) + 'px';
+					var pos = SinaEditor.util.dom.getXY(clientUploadDiv),
+						scroll = SinaEditor.util.dom.getScrollPos(),
+						//[LEFT,TOP]的偏差值
+						ps = [10,15];
+					if(SinaEditor.env.$IE) {
+						ps[0] = 200;
+					}
+					clientFile.style.left = (e.clientX - pos[0] - ps[0] + scroll[1]) + 'px';
+					clientFile.style.top = (e.clientY - pos[1] -ps[1] + scroll[0]) + 'px';
 				}
             }
         },/*{

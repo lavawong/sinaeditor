@@ -66,7 +66,6 @@ SinaEditor.plugins.add('backcolorPanel',function(args){
             "element": document,
             "events": {
                 'click' : function(e) {
-					SinaEditor.ev.stopEvent(e);
 					var target = e.target;
 					if(SinaEditor.util.dom.containsNode(editor.btns.backcolor.$,target)) {
 						return false;
