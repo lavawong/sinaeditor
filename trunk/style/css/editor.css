@@ -451,7 +451,7 @@
 
 .insetPhotoContent .urlPath{ margin-top:8px; padding:0px 4px 0px 4px;height:500px;text-align:center}
 .insetPhotoContent .clientUploadDiv{margin-top:8px;border:3px solid;border-radius:5px;height:430px;overflow:hidden;position: relative;line-height:430px;test-align:center;}
-.insetPhotoContent .clientUploadDiv .imgFile {position: absolute;cursor: pointer;opacity: 0;}
+.insetPhotoContent .clientUploadDiv .imgFile {position: absolute;top:-1000px;left:-1000px;cursor: pointer;filter:alpha(opacity=0);opacity: 0;-moz-opacity:0;outline:none;}
 .insetPhotoContent .urlPath .loading{ margin-top:8px; padding:0px 4px 0px 4px;height:500px;text-align:center;zoom:1;background:url(../imgs/loading.gif) no-repeat center center;}
 .insetPhotoContent .urlPath .clientImg {height:450px;vertical-align: middle;overflow:hidden;margin-bottom:12px;}
 .insetPhotoContent .urlPath .clientImg img{border:1px solid;padding:3px;}
