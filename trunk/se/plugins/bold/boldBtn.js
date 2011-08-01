@@ -24,8 +24,10 @@ SinaEditor.plugins.add('boldBtn',function(args){
         "events": [{
 			'element' : btn.$,
 			'events' : {
-				'click' : function() {
+				'click' : function(e) {
+					SinaEditor.ev.stopEvent(e);
 					editor.operation.bold(editor);
+					return false;
 				}
 			}
 		}]

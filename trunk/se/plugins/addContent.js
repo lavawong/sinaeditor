@@ -9,6 +9,8 @@ SinaEditor.plugins.add('addContent',function(args){
 	 * @param {Booelan} focus 是否把焦点集中到新添的节点中
 	 */
 	editor.operation.addNode = function(node,focus){
+		editor.focus();
+		
 		editor.operation.save(editor);
 		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 		if(!range.collapsed) {
@@ -27,6 +29,8 @@ SinaEditor.plugins.add('addContent',function(args){
 	 * @param {Booelan} focus 是否把焦点集中到新添的字符串中
 	 */
 	editor.operation.addContent = function(str,focus){
+		editor.focus();
+		
 		editor.operation.save(editor);
 		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 		if(!range.collapsed) {

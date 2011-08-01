@@ -108,7 +108,14 @@ SinaEditor.pkg('SinaEditor.util.dom',function(ns) {
 	ns.createDomFromHTML = function(html, ownerDocument) {
 		var div = ns.createDom('DIV',{'ownerDocument':ownerDocument});
 		div.innerHTML = html;
-		return div.removeChild(div.firstChild);
+		if(div.firstChild) {
+			return div.removeChild(div.firstChild);
+		} else {
+			//IE下插入<object>或者<embed>么有效果，套一层
+			div.innerHTML = '<div>' + html + '</div>';
+			var refC = div.firstChild;
+			return refC.removeChild(refC.firstChild);
+		}
 	};
 	
 	/**

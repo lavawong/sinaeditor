@@ -32,7 +32,8 @@ SinaEditor.plugins.add('forecolor',function(args){
 	 * @param {String} color 要修改的文字颜色。
 	 */
 	editor.operation.forecolor = function(color){
-		
+		editor.focus();
+
         editor.operation.save(editor);
 		
 		console.log('文字颜色修改');

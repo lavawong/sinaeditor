@@ -46,6 +46,7 @@ SinaEditor.plugins.add('fontFamilyBtn',function(args){
             var cn = children[i].className;
             if (cn && cn == 'fontItem') {
                 children[i].onclick = function(e){
+					editor.focus();
                     e = e || window.event;
                     var target = SinaEditor.ev.fixEvent(e).target;
                     var family = target.style.fontFamily;

@@ -46,9 +46,13 @@ SinaEditor.$abstract.redoManager = function(){
         
         var oldHTML = this.cache[editor.option.id][i].html;
         var newHTML = editor.entyBody.innerHTML;
-        
-		var ranges = SinaEditor.range.getCurrentRanges(editor.entyWin);
-		var bookmarks = this._converToBookMark(ranges);
+		
+		var ranges,bookmarks;
+		
+		if (!SinaEditor.env.$IE) {
+			ranges = SinaEditor.range.getCurrentRanges(editor.entyWin);
+			bookmarks = this._converToBookMark(ranges);
+		}
 		
         if (oldHTML !== newHTML) {
             console.log("数据不一样，保存");
@@ -97,7 +101,9 @@ SinaEditor.$abstract.redoManager = function(){
 		//阻止滚动条滚动
         setTimeout(function(){
             editor.entyBody.innerHTML = cache.html;
-            SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			if(!SinaEditor.env.$IE) {
+				SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			}
             editor.focus();
 			me._fireEvent(editor);
         }, 0);
@@ -124,7 +130,9 @@ SinaEditor.$abstract.redoManager = function(){
 		
         setTimeout(function(){
             editor.entyBody.innerHTML = cache.html;
-            SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			if(!SinaEditor.env.$IE) {
+				SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			}
             editor.focus();
 			me._fireEvent(editor);
         }, 0);

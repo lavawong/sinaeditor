@@ -35,7 +35,16 @@ SinaEditor.plugins.add('showSource', function(args){
             editor.setState(SinaEditor.STATE.SHOWSOURCE);
             filter();
             //if(args.formatter) {
-            editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
+			
+			if (!SinaEditor.env.$IE) {
+				//IE6它受不起啊。。。有木有
+				editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
+			} else {
+				editor.entyArea.value = editor.entyBody.innerHTML;
+			}
+			
+            //
+
             //} else {
             //	editor.entyArea.value = editor.entyBody.innerHTML;
             //}
