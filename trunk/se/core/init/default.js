@@ -378,6 +378,7 @@ SinaEditor.TOOLCONF.imgTemplate = ['<div class="insetPhotoContent insetPhotoCont
 		'<div id="#{clientView}">',
 			'<span>选择本地图片：</span>',
 			'<div id="#{clientUploadDiv}" class="clientUploadDiv" >',
+				'<iframe id="#{clientIframe}" name="#{clientIframe}" style="display:none" ></iframe>',
 				//TODO 这里需要配置上传的地址。
 				'<form target="#{clientIframe}" id="#{clientForm}" action="postImg.php" method="POST" enctype="multipart/form-data">',
 					'<input type="file" name="imgFile" class="imgFile" id="#{clientFile}">',
@@ -385,7 +386,6 @@ SinaEditor.TOOLCONF.imgTemplate = ['<div class="insetPhotoContent insetPhotoCont
 				'</form>',
 				'<div>点击这里选择文件。请配置上传地址，否则上传会失败。<span id="#{clientMoreUp}" style="display:none;">你也可以拖拽上传</span></div>',
 			'</div>',
-			'<iframe id="#{clientIframe}" name="#{clientIframe}" style="display:none" ></iframe>',
 		'</div>',
 		'<div id="#{contentLoading}" style="display:none">',
 			'<div class="loading"></div>',

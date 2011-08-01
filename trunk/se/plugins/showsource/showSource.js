@@ -14,6 +14,10 @@ SinaEditor.plugins.add('showSource', function(args){
         editor.entyArea = area;
         editor.enty.parentNode.appendChild(area);
     }
+	
+	if(SinaEditor.env.$IE) {
+		editor.entyArea.style.height = editor.enty.offsetHeight + 'px';
+	}
     
     if (!editor.customerBtn) {
         editor.callPlugin({
