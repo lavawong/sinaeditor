@@ -78,7 +78,7 @@ if(!SinaEditor.env) {
 	 * chrome浏览器
 	 * @name SinaEditor.env.$CHROME
 	 */
-	ns.$CHROME = /chrome/i.test(_ua);
+	ns.$CHROME = /chrome\//i.test(_ua);
 	/**
 	 * safari浏览器
 	 * @name SinaEditor.env.$SAFARI

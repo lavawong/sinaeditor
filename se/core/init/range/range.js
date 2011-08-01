@@ -14,7 +14,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 	var _queryStateArr = {};
 
     var _createRange = function(editor){
-        return editor.entyDoc.createRange(true);
+        return editor.entyDoc.createRange();
     };
     
     /**
@@ -67,6 +67,21 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(range.collapsed) {
 			return range;
 		}
+		if(range._range && range._range.item) {
+			//选中了图片或者表格
+			return range;
+		}
+		
+		if(range._range && range.startContainer && range.startContainer.nodeType === SinaEditor.NODETYPE.ELEMENT 
+			&& (range.startContainer.tagName.toUpperCase() === 'IMG' || range.startContainer.tagName.toUpperCase() === 'table')) {
+			return range;	
+		}
+		
+		if(range._range && range.endContainer && range.endContainer.nodeType === SinaEditor.NODETYPE.ELEMENT 
+			&& (range.endContainer.tagName.toUpperCase() === 'IMG' || range.endContainer.tagName.toUpperCase() === 'table')) {
+			return range;	
+		}
+		
 		var tmpRange = range.cloneRange();
 		var oldStart = range.startContainer;
 		var newStart = _whichOne(oldStart);
@@ -201,6 +216,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(!range) {
 			return null;
 		}
+		if(range.item) {
+			return range.item(0);
+		}
+		
 		var referNode = range.startContainer;
 		
 		switch(referNode.nodeType) {
@@ -283,8 +302,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         var range;
         if (selection.rangeCount > 0) {
             range = selection.getRangeAt(0);
-        }
-        else {
+        } else {
             range = win.document.createRange();
         }
         
@@ -598,15 +616,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         while (!nextEl) {
             nextEl = elm.parentNode;
             //父节点肯定有tagName
-			try{
-				//[TODO] 为破IE加的try
-				if (nextEl.tagName.toUpperCase() == 'HTML') {
-	                //到达了最高级
-	                throw '确定在遍历节点时有结束标记的节点?';
-	            }
-			} catch(e){
-				debugger;
-			}
+			if (nextEl.tagName.toUpperCase() == 'HTML') {
+                //到达了最高级
+                throw '确定在遍历节点时有结束标记的节点?';
+            }
             //鸡肋
             elm = nextEl;
             nextEl = elm.nextSibling;
@@ -629,6 +642,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
             properties: {
 				'id':'start',
                 'innerHTML': '&nbsp;'
+				//调试的时候开启
 				//'innerHTML': '开始'
             },
             attributies: {
@@ -639,44 +653,74 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		spanHead.style.color = '#FF0000';
         
         opts.range = opts.range || _createRange(editor);
-        
-        //if (!opts.range.collapsed) {
-            //有选中
-            spanEnd = domUtil.createDom('span', {
-                'ownerDocument': editor.entyDoc,
-                properties: {
-					'id':'end',
-                    'innerHTML': '&nbsp;'
-					//'innerHTML': '结束'
-                },
-                attributies: {
-                    '_se_mark': 2
-                }
-            });
-            //spanEnd.style.display = 'none';
-			spanEnd.style.color = '#FF0000';
-			if(!opts.range._document) {
+    
+        //有选中
+        spanEnd = domUtil.createDom('span', {
+            'ownerDocument': editor.entyDoc,
+            properties: {
+				'id':'end',
+                'innerHTML': '&nbsp;'
+				//调试的时候开启
+				//'innerHTML': '结束'
+            },
+            attributies: {
+                '_se_mark': 2
+            }
+        });
+        //spanEnd.style.display = 'none';
+		spanEnd.style.color = '#FF0000';
+		
+		if(!opts.range._document) {
+			clone = opts.range.cloneRange();
+            clone.collapse(false);
+            clone.insertNode(spanEnd);
+			clone = opts.range.cloneRange();
+	        clone.collapse(true);
+	        clone.insertNode(spanHead);
+		} else {
+			//去掉节点后会选不对
+			var start = opts.range.startContainer,
+				startN = opts.range.startOffset,
+				end = opts.range.endContainer,
+				endN = opts.range.endOffset,
+				refA = opts.range.__getRefA(),
+				refEnd = end.nodeType === SinaEditor.NODETYPE.ELEMENT ? end.childNodes[endN] : null,
+				refStart = start.nodeType === SinaEditor.NODETYPE.ELEMENT ? start.childNodes[startN] : null;
+				
+			//if(end.nodeType === SinaEditor.NODETYPE.ELEMENT) {
+				//DOM节点
+				//end.insertBefore(spanEnd,refEnd);
+				//opts.range.__insertAfter(spanEnd,refEnd,end);
+			//} else {
+				//文本节点
+				//)))))))))))))))))))))))))))))))))))))))))))))bug:当有ul标签时，会把span放到UL的外面去，导致根本不能结束
 				clone = opts.range.cloneRange();
 	            clone.collapse(false);
 	            clone.insertNode(spanEnd);
+			//}
+				
+			if(refStart) {
+				//DOM节点
+				start.insertBefore(spanHead,refStart);
+			} else {
+				//文本节点
 				clone = opts.range.cloneRange();
 		        clone.collapse(true);
 		        clone.insertNode(spanHead);
-			} else {
-				var dup = opts.range._range.duplicate();
-				dup.collapse(true);
-				dup.pasteHTML(spanHead.outerHTML);
-				dup = opts.range._range.duplicate();
-				dup.collapse(false);
-				dup.pasteHTML(spanEnd.outerHTML);
-				spanHead = opts.range._document.getElementById('start');
-				spanEnd = opts.range._document.getElementById('end');
 			}
-            
-            //clone.detach();
-        //}
-        //clone.detach();
-        
+			/*
+			var dup = opts.range._range.duplicate();
+			dup.collapse(true);
+			dup.pasteHTML(spanHead.outerHTML);
+			dup = opts.range._range.duplicate();
+			dup.collapse(false);
+			dup.pasteHTML(spanEnd.outerHTML);
+			spanHead = opts.range._document.getElementById('start');
+			spanEnd = opts.range._document.getElementById('end');
+			*/
+			
+		}
+    
         opts.range.setStartAfter(spanHead);
         opts.range.setEndBefore(spanEnd);
         
@@ -703,6 +747,11 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         }
         
         var range = _createRange(this);
+		if(range._range) {
+			//[TODO]关闭IE部分的检查
+			//extractContents会严重导致startContainer或者endContainer丢失，但又不能及时更新通知
+			return false;
+		}
         // We'll be extracting part of this element, so let's use our
         // range to get the correct piece.
         range.setStartAfter(child);
@@ -724,7 +773,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      * @param {Object} conf 配置信息可以参阅{@link SinaEditor.range.applyStyle}的styleConf参数
      */
     function _handleTextSelected(editor, element, conf){
-        var range = _createRange(editor);
+        //var range = _createRange(editor);
         //var span = domUtil.createDom(conf['useTagName'], {
 		var span = domUtil.createDom(conf.useTagName, {
             'ownerDocument': editor.entyDoc
@@ -740,8 +789,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if (parent.tagName.toUpperCase() === conf.useTagName) {
             console.log("它的父节点是span!");
             if (SinaEditor.util.trim(parent.textContent || parent.innerText) != SinaEditor.util.trim(element.data)) {
-                range.selectNode(element);
-                range.surroundContents(span);
+                //range.selectNode(element);
+                //range.surroundContents(span);
+				element.parentNode.insertBefore(span,element);
+				span.appendChild(element);
                 return span;
             }
             //if (conf['style']) {
@@ -753,8 +804,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         }
         if (parent.tagName.toUpperCase() == 'BODY') {
             console.log("它的父节点是Body!");
-            range.selectNode(element);
-            range.surroundContents(span);
+            //range.selectNode(element);
+            //range.surroundContents(span);
+			element.parentNode.insertBefore(span,element);
+			span.appendChild(element);
             return span;
         }
         else {
@@ -762,8 +815,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
             if (SinaEditor.RANGE.BLOCKTAGS[element.parentNode.tagName.toUpperCase()]) {
                 console.log("是块状标签");
                 //块状，把span套在里面
-                range.selectNode(element);
-                range.surroundContents(span);
+                //range.selectNode(element);
+	            //range.surroundContents(span);
+				element.parentNode.insertBefore(span,element);
+				span.appendChild(element);
                 return span;
             }
             else {
@@ -783,23 +838,30 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                         return pParent;
                     }
                     else {
-                        range.selectNode(element);
-                        range.surroundContents(span);
+                        //range.selectNode(element);
+			            //range.surroundContents(span);
+						element.parentNode.insertBefore(span,element);
+						span.appendChild(element);
                         return span;
                     }
                 }
                 else {
                     console.log("它的父节点的父节点不是span，是:");
                     console.log(pParent);
+					element.parentNode.insertBefore(span,element);
                     if (SinaEditor.util.trim(parent.textContent || parent.innerText) == SinaEditor.util.trim(element.data)) {
                         //全部选中
-                        range.selectNode(parent);
+                        //range.selectNode(parent);
+						parent.parentNode.insertBefore(span,parent);
+						span.appendChild(parent);
                     }
                     else {
                         //部分选中
-                        range.selectNode(element);
+                        //range.selectNode(element);
+						element.parentNode.insertBefore(span,element);
+						span.appendChild(element);
                     }
-                    range.surroundContents(span);
+                    //range.surroundContents(span);
                     return span;
                 }
             }
@@ -873,7 +935,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                 //只有一个子节点?
                 var children = element.childNodes;
                 //if (children.length == 1 && children[0].nodeType == 1 && children[0].tagName.toUpperCase() == conf['useTagName']) {
-				if (children.length === SinaEditor.NODETYPE.ELEMENT && children[0].nodeType == SinaEditor.NODETYPE.ELEMENT 
+				if (children.length === 1 && children[0].nodeType == SinaEditor.NODETYPE.ELEMENT 
 					&& children[0].tagName.toUpperCase() == conf.useTagName) {
                     console.log("只有一个子节点,且为span");
                     //if (conf['style']) {
@@ -884,8 +946,11 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                 }
                 else {
                     console.log("无子节点或子节点不是span标签");
-                    range.selectNodeContents(element);
-                    range.surroundContents(span);
+					element.insertBefore(span,children[0]);
+					while(children[1]) {
+						span.appendChild(children[1]);
+					}
+					retEle = span;
                 }
             }
             else {
@@ -904,8 +969,8 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                 }
                 else {
                     console.log("无父节点或不是span标签");
-                    range.selectNode(element);
-                    range.surroundContents(span);
+					parent.insertBefore(span,element);
+					span.appendChild(element);
                     retEle = span;
                 }
             }

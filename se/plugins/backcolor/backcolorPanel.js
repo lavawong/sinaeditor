@@ -52,24 +52,29 @@ SinaEditor.plugins.add('backcolorPanel',function(args){
             "element": outerDiv,
             "events": {
                 'click' : function(e) {
+					SinaEditor.ev.stopEvent(e);
+					editor.focus();
 					var target = e.target;
 					if(target.className === 'j_single_color') {
 						editor.operation.backcolor(SinaEditor.util.dom.getStyle(target, 'backgroundColor'));
 						editor.panels.backcolor.hidden();
 					}
+					return false;
 				}
             }
         },{
             "element": document,
             "events": {
                 'click' : function(e) {
+					SinaEditor.ev.stopEvent(e);
 					var target = e.target;
 					if(SinaEditor.util.dom.containsNode(editor.btns.backcolor.$,target)) {
-						return;
+						return false;
 					}
 					if(!SinaEditor.util.dom.containsNode(outerDiv,target)) {
 						editor.panels.backcolor.hidden();
 					}
+					return false;
 				}
             }
         }]

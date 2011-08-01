@@ -28,6 +28,8 @@ SinaEditor.plugins.add('fontSize',function(args){
 	 * @param {String} fontSize 要设置的字体大小
 	 */
     editor.operation.setFontSize = function(fontSize){
+		editor.focus();
+		
         editor.operation.save(editor);
         
         //添加

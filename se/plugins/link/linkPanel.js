@@ -46,11 +46,9 @@ SinaEditor.plugins.add('linkPanel',function(args){
             "element": okNode,
             "events": {
                 'click': function(){
-                    var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 					editor.operation.link({
 						'link' : linkNode.value,
 						'str' : textNode.value,
-						'range' : range,
 						'elm' : _tmpNode
 					});
 					_back();

@@ -35,6 +35,7 @@ SinaEditor.plugins.add('link',function(args){
      * 	elm 传递的节点，一定是A标签，如果包含有link，那么则替换elm的地址，没有，那么删除A标签的地址
      */
     editor.operation.link = function(optObj){
+		editor.focus();
         var range = optObj.range || SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 		var link = optObj.link;
 		var str = optObj.str || link;

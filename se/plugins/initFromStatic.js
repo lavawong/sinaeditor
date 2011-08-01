@@ -56,6 +56,10 @@ SinaEditor.plugins.add('initFromStatic',function(args){
             }
 			
             if (SinaEditor.env.$IE) {
+				try{
+					//图标被重复的请求
+					document.execCommand("BackgroundImageCache", false, true);
+				}catch(e){}
                 setTimeout(function(){
                     var doc = editor.entyDoc;
                     if (doc) {
