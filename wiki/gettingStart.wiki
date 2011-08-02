@@ -2,7 +2,7 @@
 
 = 欢迎使用 =
 
-    欢迎您选择SinaEditor，希望它能给您带来全新的编辑体验和插件编写的成就感。本章是一个快速入门的手册，希望您在阅读完以后可以快速上手。目前SinaEditor暂*不支持IE浏览器*，我们将会引入另一个开源项目[http://code.google.com/p/ierange/ ierange]，并进行二次开发。稍后的版本中，我们会尽快完善此功能！
+    欢迎您选择SinaEditor，希望它能给您带来全新的编辑体验和插件编写的成就感。本章是一个快速入门的手册，希望您在阅读完以后可以快速上手。目前SinaEditor暂*~~不支持IE浏览器#1~~*，我们将会引入另一个开源项目[http://code.google.com/p/ierange/ ierange]，并进行二次开发。稍后的版本中，我们会尽快完善此功能！
 
 = 快速开始 =
 
@@ -183,5 +183,8 @@ var editor = SinaEditor.createEditor(config);
 }}}
 
     注意，这段代码必须要等到 *sinaeditor_min.js* 下载完成和编辑器的HTML着床点完成初始化后执行，否则会导致创建失败。这样，您就完成了一次简单的SinaEditor的部署和创建工作。如果您还想对文件部分解更多的细节部分，可以继续前往[FileAnalyze]进行阅读。
+
+注：
+#1：从SinaEditor 0.9.5 beta开始，已经基本支持IE系列浏览器。
 
     
