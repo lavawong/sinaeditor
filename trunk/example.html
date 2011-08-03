@@ -17,18 +17,15 @@
 				window.console.log = function(){};
 			}
 		</script>
-		<script type="text/javascript" src="sinaeditor_min.js"></script>
 	</head>
 	<body>
 		<div class="box">
-			<!--[if IE]>
-				<div style="color:red;">暂不支持IE浏览器，可能会出现未知的错误!</div>
-			<![endif]-->
 			<div class="pro_tools" id="testSaveButtons"></div>
 			<div id="frame" class="enty-editor">
 				<textarea id="frameToText" class="se_textarea"></textarea>
 			</div>
 		</div>
+		<script type="text/javascript" src="sinaeditor_min.js"></script>
 		<script>
 			var href = window.location.href;
 			var loc = href.substring(0,href.lastIndexOf('/'));
