@@ -378,6 +378,7 @@ SinaEditor.TOOLCONF.imgTemplate = ['<div class="insetPhotoContent insetPhotoCont
 		'<div id="#{clientView}">',
 			'<span>选择本地图片：</span>',
 			'<div id="#{clientUploadDiv}" class="clientUploadDiv" >',
+				'<iframe id="#{clientIframe}" name="#{clientIframe}" style="display:none" ></iframe>',
 				//TODO 这里需要配置上传的地址。
 				'<form target="#{clientIframe}" id="#{clientForm}" action="postImg.php" method="POST" enctype="multipart/form-data">',
 					'<input type="file" name="imgFile" class="imgFile" id="#{clientFile}">',
@@ -385,7 +386,6 @@ SinaEditor.TOOLCONF.imgTemplate = ['<div class="insetPhotoContent insetPhotoCont
 				'</form>',
 				'<div>点击这里选择文件。请配置上传地址，否则上传会失败。<span id="#{clientMoreUp}" style="display:none;">你也可以拖拽上传</span></div>',
 			'</div>',
-			'<iframe id="#{clientIframe}" name="#{clientIframe}" style="display:none" ></iframe>',
 		'</div>',
 		'<div id="#{contentLoading}" style="display:none">',
 			'<div class="loading"></div>',
@@ -559,7 +559,7 @@ if(!SinaEditor.env) {
 	 * chrome浏览器
 	 * @name SinaEditor.env.$CHROME
 	 */
-	ns.$CHROME = /chrome/i.test(_ua);
+	ns.$CHROME = /chrome\//i.test(_ua);
 	/**
 	 * safari浏览器
 	 * @name SinaEditor.env.$SAFARI
@@ -1795,7 +1795,14 @@ SinaEditor.pkg('SinaEditor.util.dom',function(ns) {
 	ns.createDomFromHTML = function(html, ownerDocument) {
 		var div = ns.createDom('DIV',{'ownerDocument':ownerDocument});
 		div.innerHTML = html;
-		return div.removeChild(div.firstChild);
+		if(div.firstChild) {
+			return div.removeChild(div.firstChild);
+		} else {
+			//IE下插入<object>或者<embed>么有效果，套一层
+			div.innerHTML = '<div>' + html + '</div>';
+			var refC = div.firstChild;
+			return refC.removeChild(refC.firstChild);
+		}
 	};
 	
 	/**
@@ -2392,6 +2399,21 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(range.collapsed) {
 			return range;
 		}
+		if(range._range && range._range.item) {
+			//选中了图片或者表格
+			return range;
+		}
+		
+		if(range._range && range.startContainer && range.startContainer.nodeType === SinaEditor.NODETYPE.ELEMENT 
+			&& (range.startContainer.tagName.toUpperCase() === 'IMG' || range.startContainer.tagName.toUpperCase() === 'table')) {
+			return range;	
+		}
+		
+		if(range._range && range.endContainer && range.endContainer.nodeType === SinaEditor.NODETYPE.ELEMENT 
+			&& (range.endContainer.tagName.toUpperCase() === 'IMG' || range.endContainer.tagName.toUpperCase() === 'table')) {
+			return range;	
+		}
+		
 		var tmpRange = range.cloneRange();
 		var oldStart = range.startContainer;
 		var newStart = _whichOne(oldStart);
@@ -2526,6 +2548,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(!range) {
 			return null;
 		}
+		if(range.item) {
+			return range.item(0);
+		}
+		
 		var referNode = range.startContainer;
 		
 		switch(referNode.nodeType) {
@@ -2542,8 +2568,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			case SinaEditor.NODETYPE.TEXT : 
 				console.log('SinaEditor.NODETYPE.TEXT');
 				var parent = referNode.parentNode;
-				//有可能被拆卸了
-				parent.normalize();
+				try {
+					//有可能被拆卸了
+					parent.normalize();
+				}  catch(e){}
 				if(parent.childNodes.length == 1) {
 					return parent;
 				}
@@ -2606,8 +2634,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         var range;
         if (selection.rangeCount > 0) {
             range = selection.getRangeAt(0);
-        }
-        else {
+        } else {
             range = win.document.createRange();
         }
         
@@ -2667,32 +2694,36 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
     ns.applyStyle = function(editor, styleConf){
         styleConf.useTagName = styleConf.useTagName || 'span';
         var range = ns.getCurrentRanges(editor.entyWin)[0];
-		editor.entyDoc.normalize();
+
+		try {
+			editor.entyDoc.normalize();
+		} catch(e){}
 
 		if (range.collapsed) {
 			var elm = null;
 			var startContainer = range.startContainer;
 			//注意，最后那个不是空字符串。是一个0宽度的空格
-			if(startContainer.nodeType === SinaEditor.NODETYPE.ELEMENT 
-				//&& startContainer.tagName.toUpperCase() === styleConf['useTagName'].toUpperCase() 
-				&& startContainer.tagName.toUpperCase() === styleConf.useTagName.toUpperCase()
-				&& startContainer.innerHTML === '​') {
+			if (startContainer.nodeType === SinaEditor.NODETYPE.ELEMENT //&& startContainer.tagName.toUpperCase() === styleConf['useTagName'].toUpperCase() 
+			&&
+			startContainer.tagName.toUpperCase() === styleConf.useTagName.toUpperCase() &&
+			startContainer.innerHTML === '​') {
 				//重复的选取
 				elm = startContainer;
-			} else {
+			}
+			else {
 				//elm = domUtil.createDom(styleConf['useTagName'], {
 				elm = domUtil.createDom(styleConf.useTagName, {
-	                'ownerDocument': editor.entyDoc
-	            });
+					'ownerDocument': editor.entyDoc
+				});
 				elm.innerHTML = '&#x200b;';
 				range.insertNode(elm);
 			}
 			
-            //if (styleConf['style']) {
+			//if (styleConf['style']) {
 			if (styleConf.style) {
-                //elm.style[styleConf['style']] = styleConf['value'];
+				//elm.style[styleConf['style']] = styleConf['value'];
 				elm.style[styleConf.style] = styleConf.value;
-            }
+			}
 			range.selectNodeContents(elm);
 			range.collapse(false);
 			ns.applyRanges(editor.entyWin, range);
@@ -2703,6 +2734,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		var marks = _createBookmark(editor, {
             'range': range
         });
+		
 		//拆分块状元素，判断放在了函数里
         if(marks.end){
 			_breakParent.call(editor, marks.end);
@@ -2835,8 +2867,9 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         });
         
         //if (range.toString()) {
-        
-			editor.entyDoc.normalize();
+			try {
+				editor.entyDoc.normalize();
+			} catch(e){}
 			
 			if(!noBreak) {
 				//拆分块状元素，判断放在了函数里
@@ -2915,7 +2948,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         while (!nextEl) {
             nextEl = elm.parentNode;
             //父节点肯定有tagName
-            if (nextEl.tagName.toUpperCase() == 'HTML') {
+			if (nextEl.tagName.toUpperCase() == 'HTML') {
                 //到达了最高级
                 throw '确定在遍历节点时有结束标记的节点?';
             }
@@ -2933,12 +2966,16 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      */
     var _createBookmark = function(editor, opts){
         opts = opts || {};
-        var spanHead;
-        var spanEnd;
+        var spanHead,
+			spanEnd,
+			clone;
         spanHead = domUtil.createDom('span', {
             'ownerDocument': editor.entyDoc,
             properties: {
+				'id':'start',
                 'innerHTML': '&nbsp;'
+				//调试的时候开启
+				//'innerHTML': '开始'
             },
             attributies: {
                 '_se_mark': 1
@@ -2948,39 +2985,76 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		spanHead.style.color = '#FF0000';
         
         opts.range = opts.range || _createRange(editor);
-        
-        if (!opts.range.collapsed) {
-            //有选中
-            spanEnd = domUtil.createDom('span', {
-                'ownerDocument': editor.entyDoc,
-                properties: {
-                    'innerHTML': '&nbsp;'
-					//'innerHTML': '结束'
-                },
-                attributies: {
-                    '_se_mark': 2
-                }
-            });
-            //spanEnd.style.display = 'none';
-			spanEnd.style.color = '#FF0000';
-            var clone = opts.range.cloneRange();
+    
+        //有选中
+        spanEnd = domUtil.createDom('span', {
+            'ownerDocument': editor.entyDoc,
+            properties: {
+				'id':'end',
+                'innerHTML': '&nbsp;'
+				//调试的时候开启
+				//'innerHTML': '结束'
+            },
+            attributies: {
+                '_se_mark': 2
+            }
+        });
+        //spanEnd.style.display = 'none';
+		spanEnd.style.color = '#FF0000';
+		
+		if(!opts.range._document) {
+			clone = opts.range.cloneRange();
             clone.collapse(false);
             clone.insertNode(spanEnd);
-            //clone.detach();
-        }
-        clone = opts.range.cloneRange();
-        clone.collapse(true);
-        clone.insertNode(spanHead);
-        //clone.detach();
-        
-        if (spanEnd) {
-            opts.range.setStartAfter(spanHead);
-            opts.range.setEndBefore(spanEnd);
-        }
-        else {
-            opts.range.setStartAfter(spanHead);
-            opts.range.collapse(true);
-        }
+			clone = opts.range.cloneRange();
+	        clone.collapse(true);
+	        clone.insertNode(spanHead);
+		} else {
+			//去掉节点后会选不对
+			var start = opts.range.startContainer,
+				startN = opts.range.startOffset,
+				end = opts.range.endContainer,
+				endN = opts.range.endOffset,
+				refA = opts.range.__getRefA(),
+				refEnd = end.nodeType === SinaEditor.NODETYPE.ELEMENT ? end.childNodes[endN] : null,
+				refStart = start.nodeType === SinaEditor.NODETYPE.ELEMENT ? start.childNodes[startN] : null;
+				
+			//if(end.nodeType === SinaEditor.NODETYPE.ELEMENT) {
+				//DOM节点
+				//end.insertBefore(spanEnd,refEnd);
+				//opts.range.__insertAfter(spanEnd,refEnd,end);
+			//} else {
+				//文本节点
+				//)))))))))))))))))))))))))))))))))))))))))))))bug:当有ul标签时，会把span放到UL的外面去，导致根本不能结束
+				clone = opts.range.cloneRange();
+	            clone.collapse(false);
+	            clone.insertNode(spanEnd);
+			//}
+				
+			if(refStart) {
+				//DOM节点
+				start.insertBefore(spanHead,refStart);
+			} else {
+				//文本节点
+				clone = opts.range.cloneRange();
+		        clone.collapse(true);
+		        clone.insertNode(spanHead);
+			}
+			/*
+			var dup = opts.range._range.duplicate();
+			dup.collapse(true);
+			dup.pasteHTML(spanHead.outerHTML);
+			dup = opts.range._range.duplicate();
+			dup.collapse(false);
+			dup.pasteHTML(spanEnd.outerHTML);
+			spanHead = opts.range._document.getElementById('start');
+			spanEnd = opts.range._document.getElementById('end');
+			*/
+			
+		}
+    
+        opts.range.setStartAfter(spanHead);
+        opts.range.setEndBefore(spanEnd);
         
         ns.applyRanges(editor.entyWin, opts.range);
         
@@ -3005,6 +3079,11 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         }
         
         var range = _createRange(this);
+		if(range._range) {
+			//[TODO]关闭IE部分的检查
+			//extractContents会严重导致startContainer或者endContainer丢失，但又不能及时更新通知
+			return false;
+		}
         // We'll be extracting part of this element, so let's use our
         // range to get the correct piece.
         range.setStartAfter(child);
@@ -3026,7 +3105,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      * @param {Object} conf 配置信息可以参阅{@link SinaEditor.range.applyStyle}的styleConf参数
      */
     function _handleTextSelected(editor, element, conf){
-        var range = _createRange(editor);
+        //var range = _createRange(editor);
         //var span = domUtil.createDom(conf['useTagName'], {
 		var span = domUtil.createDom(conf.useTagName, {
             'ownerDocument': editor.entyDoc
@@ -3041,9 +3120,11 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         //if (parent.tagName.toUpperCase() == conf['useTagName']) {
 		if (parent.tagName.toUpperCase() === conf.useTagName) {
             console.log("它的父节点是span!");
-            if (SinaEditor.util.trim(parent.textContent) != SinaEditor.util.trim(element.data)) {
-                range.selectNode(element);
-                range.surroundContents(span);
+            if (SinaEditor.util.trim(parent.textContent || parent.innerText) != SinaEditor.util.trim(element.data)) {
+                //range.selectNode(element);
+                //range.surroundContents(span);
+				element.parentNode.insertBefore(span,element);
+				span.appendChild(element);
                 return span;
             }
             //if (conf['style']) {
@@ -3055,8 +3136,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         }
         if (parent.tagName.toUpperCase() == 'BODY') {
             console.log("它的父节点是Body!");
-            range.selectNode(element);
-            range.surroundContents(span);
+            //range.selectNode(element);
+            //range.surroundContents(span);
+			element.parentNode.insertBefore(span,element);
+			span.appendChild(element);
             return span;
         }
         else {
@@ -3064,8 +3147,10 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
             if (SinaEditor.RANGE.BLOCKTAGS[element.parentNode.tagName.toUpperCase()]) {
                 console.log("是块状标签");
                 //块状，把span套在里面
-                range.selectNode(element);
-                range.surroundContents(span);
+                //range.selectNode(element);
+	            //range.surroundContents(span);
+				element.parentNode.insertBefore(span,element);
+				span.appendChild(element);
                 return span;
             }
             else {
@@ -3076,7 +3161,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 				if (pParent && pParent.nodeType === SinaEditor.NODETYPE.ELEMENT 
 					&& pParent.tagName.toUpperCase() == conf.useTagName) {
                     console.log("它的父节点的父节点是span");
-                    if (SinaEditor.util.trim(pParent.textContent) == SinaEditor.util.trim(element.data)) {
+                    if (SinaEditor.util.trim(parent.textContent || parent.innerText) == SinaEditor.util.trim(element.data)) {
                         //if (conf['style']) {
 						if (conf.style) {
                             //pParent.style[conf['style']] = conf['value'];
@@ -3085,23 +3170,30 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                         return pParent;
                     }
                     else {
-                        range.selectNode(element);
-                        range.surroundContents(span);
+                        //range.selectNode(element);
+			            //range.surroundContents(span);
+						element.parentNode.insertBefore(span,element);
+						span.appendChild(element);
                         return span;
                     }
                 }
                 else {
                     console.log("它的父节点的父节点不是span，是:");
                     console.log(pParent);
-                    if (SinaEditor.util.trim(parent.textContent) == SinaEditor.util.trim(element.data)) {
+					element.parentNode.insertBefore(span,element);
+                    if (SinaEditor.util.trim(parent.textContent || parent.innerText) == SinaEditor.util.trim(element.data)) {
                         //全部选中
-                        range.selectNode(parent);
+                        //range.selectNode(parent);
+						parent.parentNode.insertBefore(span,parent);
+						span.appendChild(parent);
                     }
                     else {
                         //部分选中
-                        range.selectNode(element);
+                        //range.selectNode(element);
+						element.parentNode.insertBefore(span,element);
+						span.appendChild(element);
                     }
-                    range.surroundContents(span);
+                    //range.surroundContents(span);
                     return span;
                 }
             }
@@ -3175,7 +3267,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                 //只有一个子节点?
                 var children = element.childNodes;
                 //if (children.length == 1 && children[0].nodeType == 1 && children[0].tagName.toUpperCase() == conf['useTagName']) {
-				if (children.length === SinaEditor.NODETYPE.ELEMENT && children[0].nodeType == SinaEditor.NODETYPE.ELEMENT 
+				if (children.length === 1 && children[0].nodeType == SinaEditor.NODETYPE.ELEMENT 
 					&& children[0].tagName.toUpperCase() == conf.useTagName) {
                     console.log("只有一个子节点,且为span");
                     //if (conf['style']) {
@@ -3186,8 +3278,11 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                 }
                 else {
                     console.log("无子节点或子节点不是span标签");
-                    range.selectNodeContents(element);
-                    range.surroundContents(span);
+					element.insertBefore(span,children[0]);
+					while(children[1]) {
+						span.appendChild(children[1]);
+					}
+					retEle = span;
                 }
             }
             else {
@@ -3206,8 +3301,8 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
                 }
                 else {
                     console.log("无父节点或不是span标签");
-                    range.selectNode(element);
-                    range.surroundContents(span);
+					parent.insertBefore(span,element);
+					span.appendChild(element);
                     retEle = span;
                 }
             }
@@ -3364,28 +3459,31 @@ SinaEditor.ev.customEvent.editorOnladed = function(editor) {};
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.editorSelectionChange = function(editor){
-
-    var _listener = function(e){
-        editor.entyWin.clearTimeout(editor._.editorHasSelectionBufferTimmer);
-        editor._.editorHasSelectionBufferTimmer = editor.entyWin.setTimeout(function(){
+	var _listener = function(e){
+		//SinaEditor.ev.stopEvent(e);
+	    editor.entyWin.clearTimeout(editor._.editorHasSelectionBufferTimmer);
+	    editor._.editorHasSelectionBufferTimmer = editor.entyWin.setTimeout(function(){
             //虽然可以多选，但是只检测第一个
             var ranges = SinaEditor.range.getCurrentRanges(editor.entyWin);
             var current0 = ranges[0];
             var old0;
             
             if (!editor._.oldRange) {
+				console.log('两个range不相等');
                 _handleEvent.call(editor, e, current0);
             }
             else {
                 old0 = editor._.oldRange[0];
                 if (current0 || old0) {
                     if (SinaEditor.range.compareBoundaryPoints(current0, old0) !== 0) {
+						console.log('两个range不相等');
                         _handleEvent.call(editor, e, current0);
                     }
                 }
             }
             editor._.oldRange = ranges;
         }, 400);
+		return false;
     };
     
     var _handleEvent = function(e, range){
@@ -3394,7 +3492,7 @@ SinaEditor.ev.customEvent.editorSelectionChange = function(editor){
             'args': [range, SinaEditor.range.getReferNode(this.entyWin, range)]
         });
     };
-    
+
     return [{
         'enty': editor.entyDoc,
         'events': {
@@ -3819,7 +3917,12 @@ SinaEditor.$abstract.Storage = (function(){
 	} else {
 		saveObj = document.createElement('div');
 		saveObj.addBehavior("#default#userData");
-		document.body.appendChild(saveObj);
+		if(document.body) {
+			document.body.appendChild(saveObj);
+		} else {
+			//在head中引用，body有可能还没有被初始化
+			document.getElementsByTagName('head')[0].appendChild(saveObj);
+		}
 		saveObj.load('SinaEditor');
 		
 		proxyObj.setItem = function(key,value) {
@@ -4821,9 +4924,13 @@ SinaEditor.$abstract.redoManager = function(){
         
         var oldHTML = this.cache[editor.option.id][i].html;
         var newHTML = editor.entyBody.innerHTML;
-        
-		var ranges = SinaEditor.range.getCurrentRanges(editor.entyWin);
-		var bookmarks = this._converToBookMark(ranges);
+		
+		var ranges,bookmarks;
+		
+		if (!SinaEditor.env.$IE) {
+			ranges = SinaEditor.range.getCurrentRanges(editor.entyWin);
+			bookmarks = this._converToBookMark(ranges);
+		}
 		
         if (oldHTML !== newHTML) {
             console.log("数据不一样，保存");
@@ -4872,7 +4979,9 @@ SinaEditor.$abstract.redoManager = function(){
 		//阻止滚动条滚动
         setTimeout(function(){
             editor.entyBody.innerHTML = cache.html;
-            SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			if(!SinaEditor.env.$IE) {
+				SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			}
             editor.focus();
 			me._fireEvent(editor);
         }, 0);
@@ -4899,7 +5008,9 @@ SinaEditor.$abstract.redoManager = function(){
 		
         setTimeout(function(){
             editor.entyBody.innerHTML = cache.html;
-            SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			if(!SinaEditor.env.$IE) {
+				SinaEditor.range.applyRanges(editor.entyWin,me._converToRange(editor.entyDoc,cache.ranges));
+			}
             editor.focus();
 			me._fireEvent(editor);
         }, 0);
@@ -5019,6 +5130,8 @@ SinaEditor.plugins.add('addContent',function(args){
 	 * @param {Booelan} focus 是否把焦点集中到新添的节点中
 	 */
 	editor.operation.addNode = function(node,focus){
+		editor.focus();
+		
 		editor.operation.save(editor);
 		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 		if(!range.collapsed) {
@@ -5037,6 +5150,8 @@ SinaEditor.plugins.add('addContent',function(args){
 	 * @param {Booelan} focus 是否把焦点集中到新添的字符串中
 	 */
 	editor.operation.addContent = function(str,focus){
+		editor.focus();
+		
 		editor.operation.save(editor);
 		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 		if(!range.collapsed) {
@@ -5207,11 +5322,14 @@ SinaEditor.plugins.add('backcolorPanel',function(args){
             "element": outerDiv,
             "events": {
                 'click' : function(e) {
+					SinaEditor.ev.stopEvent(e);
+					editor.focus();
 					var target = e.target;
 					if(target.className === 'j_single_color') {
 						editor.operation.backcolor(SinaEditor.util.dom.getStyle(target, 'backgroundColor'));
 						editor.panels.backcolor.hidden();
 					}
+					return false;
 				}
             }
         },{
@@ -5220,11 +5338,12 @@ SinaEditor.plugins.add('backcolorPanel',function(args){
                 'click' : function(e) {
 					var target = e.target;
 					if(SinaEditor.util.dom.containsNode(editor.btns.backcolor.$,target)) {
-						return;
+						return false;
 					}
 					if(!SinaEditor.util.dom.containsNode(outerDiv,target)) {
 						editor.panels.backcolor.hidden();
 					}
+					return false;
 				}
             }
         }]
@@ -5328,8 +5447,10 @@ SinaEditor.plugins.add('boldBtn',function(args){
         "events": [{
 			'element' : btn.$,
 			'events' : {
-				'click' : function() {
+				'click' : function(e) {
+					SinaEditor.ev.stopEvent(e);
 					editor.operation.bold(editor);
+					return false;
 				}
 			}
 		}]
@@ -5692,6 +5813,8 @@ SinaEditor.plugins.add('fontSize',function(args){
 	 * @param {String} fontSize 要设置的字体大小
 	 */
     editor.operation.setFontSize = function(fontSize){
+		editor.focus();
+		
         editor.operation.save(editor);
         
         //添加
@@ -5906,6 +6029,7 @@ SinaEditor.plugins.add('fontFamilyBtn',function(args){
             var cn = children[i].className;
             if (cn && cn == 'fontItem') {
                 children[i].onclick = function(e){
+					editor.focus();
                     e = e || window.event;
                     var target = SinaEditor.ev.fixEvent(e).target;
                     var family = target.style.fontFamily;
@@ -6031,7 +6155,8 @@ SinaEditor.plugins.add('forecolor',function(args){
 	 * @param {String} color 要修改的文字颜色。
 	 */
 	editor.operation.forecolor = function(color){
-		
+		editor.focus();
+
         editor.operation.save(editor);
 		
 		console.log('文字颜色修改');
@@ -6837,10 +6962,15 @@ SinaEditor.plugins.add('imgUIPanel',function(args){
             "element": clientUploadDiv,
             "events": {
 				'mousemove' : function(e) {
-					var pos = SinaEditor.util.dom.getXY(clientUploadDiv);
-					var scroll = SinaEditor.util.dom.getScrollPos();
-					clientFile.style.left = (e.clientX - pos[0] - 10 + scroll[1]) + 'px';
-					clientFile.style.top = (e.clientY - pos[1] -15 + scroll[0]) + 'px';
+					var pos = SinaEditor.util.dom.getXY(clientUploadDiv),
+						scroll = SinaEditor.util.dom.getScrollPos(),
+						//[LEFT,TOP]的偏差值
+						ps = [10,15];
+					if(SinaEditor.env.$IE) {
+						ps[0] = 200;
+					}
+					clientFile.style.left = (e.clientX - pos[0] - ps[0] + scroll[1]) + 'px';
+					clientFile.style.top = (e.clientY - pos[1] -ps[1] + scroll[0]) + 'px';
 				}
             }
         },/*{
@@ -7033,6 +7163,10 @@ SinaEditor.plugins.add('initFromStatic',function(args){
             }
 			
             if (SinaEditor.env.$IE) {
+				try{
+					//图标被重复的请求
+					document.execCommand("BackgroundImageCache", false, true);
+				}catch(e){}
                 setTimeout(function(){
                     var doc = editor.entyDoc;
                     if (doc) {
@@ -7049,7 +7183,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
 	            'ownerDocument': editor.entyDoc,
 	            'attributes': {
 					'type':'text/javascript',
-	                'src':'http://test.sina.com.cn/editor/ierange-m2.js'
+	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+(+new Date())
 	            }
 	        });
 			
@@ -7510,6 +7644,7 @@ SinaEditor.plugins.add('link',function(args){
      * 	elm 传递的节点，一定是A标签，如果包含有link，那么则替换elm的地址，没有，那么删除A标签的地址
      */
     editor.operation.link = function(optObj){
+		editor.focus();
         var range = optObj.range || SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 		var link = optObj.link;
 		var str = optObj.str || link;
@@ -7678,11 +7813,9 @@ SinaEditor.plugins.add('linkPanel',function(args){
             "element": okNode,
             "events": {
                 'click': function(){
-                    var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 					editor.operation.link({
 						'link' : linkNode.value,
 						'str' : textNode.value,
-						'range' : range,
 						'elm' : _tmpNode
 					});
 					_back();
@@ -8149,6 +8282,10 @@ SinaEditor.plugins.add('showSource', function(args){
         editor.entyArea = area;
         editor.enty.parentNode.appendChild(area);
     }
+	
+	if(SinaEditor.env.$IE) {
+		editor.entyArea.style.height = editor.enty.offsetHeight + 'px';
+	}
     
     if (!editor.customerBtn) {
         editor.callPlugin({
@@ -8170,7 +8307,16 @@ SinaEditor.plugins.add('showSource', function(args){
             editor.setState(SinaEditor.STATE.SHOWSOURCE);
             filter();
             //if(args.formatter) {
-            editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
+			
+			if (!SinaEditor.env.$IE) {
+				//IE6它受不起啊。。。有木有
+				editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
+			} else {
+				editor.entyArea.value = editor.entyBody.innerHTML;
+			}
+			
+            //
+
             //} else {
             //	editor.entyArea.value = editor.entyBody.innerHTML;
             //}
