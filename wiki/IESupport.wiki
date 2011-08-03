@@ -1,4 +1,4 @@
-#SinaEditor 0.9.5开始对IE系列进行支持
+#summary SinaEditor 0.9.5开始对IE系列进行支持
 
 = SinaEditor从0.9.5版开始支持IE浏览器了 =
 
