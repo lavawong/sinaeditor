@@ -64,11 +64,20 @@ SinaEditor.pkg('SinaEditor.util', function(ns){
 		
 		switch(type) {
 			case '[object Array]' :
-				var i;
 				strs.push('[');
+				/*
+				//在IE下不会完整的循环完毕
+				var i;
 				for(i=0,len=o.length; i<len; i++) {
 					strs.push(me(o[i]));
 					strs.push(',');
+				}
+				*/
+				var tmp = o.shift();
+				while(tmp) {
+					strs.push(me(tmp));
+					strs.push(',');
+					tmp = o.shift();
 				}
 				if(strs[1]) {
 					strs.pop();
