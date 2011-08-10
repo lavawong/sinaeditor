@@ -4,6 +4,8 @@ if (!window.SinaEditor) {
     SinaEditor = {};
 }
 
+SinaEditor.version = 1.0;
+
 if (!SinaEditor.CONF) {
     SinaEditor.CONF = {};
 }
@@ -501,10 +503,11 @@ if(!SinaEditor.env) {
 (function(ns){
 	var _ua = navigator.userAgent.toLowerCase();
 	/**
-	 * IE系列浏览器
+	 * IE系列浏览器，并返回版本号
 	 * @name SinaEditor.env.$IE
 	 */
-	ns.$IE = /msie/.test(_ua);
+	var ieArr = /msie (\d+)\./.exec(_ua) || [];
+	ns.$IE = ieArr[1];
 	/**
 	 * opear系列浏览器
 	 * @name SinaEditor.env.$OPERA
@@ -521,11 +524,6 @@ if(!SinaEditor.env) {
 	 */
 	ns.$WEBKIT = /applewebkit/.test(_ua);
 	/**
-	 * IE5浏览器
-	 * @name SinaEditor.env.$IE5
-	 */
-	ns.$IE5 = /msie 5 /.test(_ua);
-	/**
 	 * IE6浏览器
 	 * @name SinaEditor.env.$IE6
 	 */
@@ -540,6 +538,11 @@ if(!SinaEditor.env) {
 	 * @name SinaEditor.env.$IE8
 	 */
 	ns.$IE8 = /msie 8/.test(_ua);
+	/**
+	 * IE9浏览器
+	 * @name SinaEditor.env.$IE8
+	 */
+	ns.$IE9 = /msie 9/.test(_ua);
 	/**
 	 * XP系统
 	 * @name SinaEditor.env.$winXP
@@ -729,14 +732,14 @@ SinaEditor.ev = {};
 	 * @param {Object} ev 事件参数
 	 */
 	ns.stopEvent = function(ev){
-		ev.cancelBubble = true;
-		ev.returnValue = false;
-	};
-	if (!SinaEditor.env.$IE) {
-	    ns.stopEvent = function(ev){
-			ev.preventDefault();
-			ev.stopPropagation();
-	    };
+		ev.preventDefault();
+		ev.stopPropagation();
+    };
+	if (SinaEditor.env.$IE < 9) {
+		ns.stopEvent = function(ev){
+			ev.cancelBubble = true;
+			ev.returnValue = false;
+		};
 	}
 	
 	/**
@@ -1175,11 +1178,20 @@ SinaEditor.pkg('SinaEditor.util', function(ns){
 		
 		switch(type) {
 			case '[object Array]' :
-				var i;
 				strs.push('[');
+				/*
+				//在IE下不会完整的循环完毕
+				var i;
 				for(i=0,len=o.length; i<len; i++) {
 					strs.push(me(o[i]));
 					strs.push(',');
+				}
+				*/
+				var tmp = o.shift();
+				while(tmp) {
+					strs.push(me(tmp));
+					strs.push(',');
+					tmp = o.shift();
 				}
 				if(strs[1]) {
 					strs.pop();
@@ -2730,16 +2742,16 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			editor.focus();
 			return;
 		}
-		
+
 		var marks = _createBookmark(editor, {
             'range': range
         });
 		
 		//拆分块状元素，判断放在了函数里
         if(marks.end){
-			_breakParent.call(editor, marks.end);
+			marks.end = _breakParent.call(editor, marks.end);
 		}
-        _breakParent.call(editor, marks.start);
+        marks.start = _breakParent.call(editor, marks.start);
 		
         //if (range.toString()) {
             //在多行情况下，firefox有可能会选上结尾的br节点
@@ -2861,7 +2873,6 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			editor.focus();
             return;
         }
-        
         var marks = _createBookmark(editor, {
             'range': range
         });
@@ -2873,8 +2884,8 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			
 			if(!noBreak) {
 				//拆分块状元素，判断放在了函数里
-                _breakParent.call(editor, marks.end);
-                _breakParent.call(editor, marks.start);
+                marks.end = _breakParent.call(editor, marks.end);
+                marks.start = _breakParent.call(editor, marks.start);
 			}
             
             _getNextNode(marks.start, marks.end, function(currEle){
@@ -3005,7 +3016,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(!opts.range._document) {
 			clone = opts.range.cloneRange();
             clone.collapse(false);
-            clone.insertNode(spanEnd);
+			clone.insertNode(spanEnd);
 			clone = opts.range.cloneRange();
 	        clone.collapse(true);
 	        clone.insertNode(spanHead);
@@ -3017,19 +3028,19 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 				endN = opts.range.endOffset,
 				refA = opts.range.__getRefA(),
 				refEnd = end.nodeType === SinaEditor.NODETYPE.ELEMENT ? end.childNodes[endN] : null,
-				refStart = start.nodeType === SinaEditor.NODETYPE.ELEMENT ? start.childNodes[startN] : null;
-				
-			//if(end.nodeType === SinaEditor.NODETYPE.ELEMENT) {
-				//DOM节点
-				//end.insertBefore(spanEnd,refEnd);
-				//opts.range.__insertAfter(spanEnd,refEnd,end);
-			//} else {
-				//文本节点
-				//)))))))))))))))))))))))))))))))))))))))))))))bug:当有ul标签时，会把span放到UL的外面去，导致根本不能结束
-				clone = opts.range.cloneRange();
-	            clone.collapse(false);
-	            clone.insertNode(spanEnd);
-			//}
+				refStart = start.nodeType === SinaEditor.NODETYPE.ELEMENT ? start.childNodes[startN] : null,prev;
+
+			clone = opts.range.cloneRange();
+            clone.collapse(false);
+            clone.insertNode(spanEnd);
+			
+			//end要做一次修正，有可能出现：
+			//<ul><li></li><span id="end"></span></ul>的情况。
+			prev = spanEnd.previousSibling;
+			
+			if(prev && prev.tagName && 'LI OL'.indexOf(prev.tagName.toUpperCase() != -1)) {
+				prev.appendChild(spanEnd);
+			}
 				
 			if(refStart) {
 				//DOM节点
@@ -3040,17 +3051,6 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		        clone.collapse(true);
 		        clone.insertNode(spanHead);
 			}
-			/*
-			var dup = opts.range._range.duplicate();
-			dup.collapse(true);
-			dup.pasteHTML(spanHead.outerHTML);
-			dup = opts.range._range.duplicate();
-			dup.collapse(false);
-			dup.pasteHTML(spanEnd.outerHTML);
-			spanHead = opts.range._document.getElementById('start');
-			spanEnd = opts.range._document.getElementById('end');
-			*/
-			
 		}
     
         opts.range.setStartAfter(spanHead);
@@ -3075,14 +3075,91 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         var parent = domUtil.getBlockParent(child);
         if (!parent) {
             //父元素就是块状元素，没有必要拆分
-            return false;
+            return child;
         }
         
         var range = _createRange(this);
 		if(range._range) {
-			//[TODO]关闭IE部分的检查
 			//extractContents会严重导致startContainer或者endContainer丢失，但又不能及时更新通知
-			return false;
+			//非常讨厌的textRange,当没有节点包裹时，标签节点也不会被包围住。所以得再套上一层。
+			//bug:<strong>ab|cde|fg</strong> -> 去加粗操作，失败。
+			//debugger;
+			var doc = parent.document,
+				rRange = range._range,
+				pPar = parent.parentNode,
+				cPar = child.parentNode,
+				sRef = range.__getRefA(),
+				sRef2 = range.__getRefA(),
+				eRef = range.__getRefA(),
+				eRef2 = range.__getRefA(),
+				refNode = range.__getRefA(),
+				dupMove = rRange.duplicate(),
+				dupRef = rRange.duplicate(),
+				frage = parent.document.createDocumentFragment(),
+				tmp = doc.createElement('div'),refID;
+				
+			sRef.id = 'refStart';
+			eRef.id = 'refEnd';
+			refNode.id = 'refNode';
+
+			if(child.id === 'start') {
+				//开始部分
+				pPar.insertBefore(sRef,parent);
+				cPar.insertBefore(eRef,child);
+				refID = 'start';
+				
+				sRef.parentNode.insertBefore(sRef2,sRef);
+				range.__insertAfter(eRef2,eRef);
+				
+				sRef2.parentNode.insertBefore(refNode,sRef2);
+			} else {
+				//结束部分
+				range.__insertAfter(sRef,child,cPar);
+				range.__insertAfter(eRef,parent,pPar);
+				refID = 'end';
+				
+				sRef.parentNode.insertBefore(sRef2,sRef);
+				range.__insertAfter(eRef2,eRef);
+				
+				range.__insertAfter(refNode,eRef2);
+			}
+			
+			dupRef.moveToElementText(sRef2);
+			dupMove.moveToElementText(sRef2);
+			dupRef.setEndPoint('StartToEnd',dupMove);
+			dupMove.moveToElementText(eRef2);
+			dupRef.setEndPoint('EndToStart',dupMove);
+			
+			sRef.parentNode.removeChild(sRef2);
+			eRef.parentNode.removeChild(eRef2);
+			
+			tmp.innerHTML = dupRef.htmlText;
+			frage.appendChild(tmp);
+			while(tmp.childNodes[0]) {
+				frage.appendChild(tmp.childNodes[0]);
+			}
+			frage.removeChild(tmp);
+			dupRef.pasteHTML('');
+			refNode.parentNode.insertBefore(frage,refNode);
+			refNode.parentNode.removeChild(refNode);
+			
+			sRef = doc.getElementById('refStart');
+			sRef.parentNode.removeChild(sRef);
+			eRef = doc.getElementById('refEnd');
+			eRef.parentNode.removeChild(eRef);
+			
+			if (refID === 'start') {
+				//开始部分
+				pPar.insertBefore(child,child.parentNode);
+			} else {
+				//结束部分
+				range.__insertAfter(child,child.parentNode);
+			}
+			
+			//修复Container和Offset
+			range._refreshAll();
+			
+			return doc.getElementById(refID);
 		}
         // We'll be extracting part of this element, so let's use our
         // range to get the correct piece.
@@ -3095,7 +3172,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         // Re-insert the extracted piece after the element.
         domUtil.insertAfter(docFrag, child);
 		
-		return true;
+		return child;
     };
     
     /**
@@ -3247,7 +3324,6 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 						&& !arr[num].style.cssText) {
                     var tmpRange = _createRange(editor);
                     tmpRange.selectNode(arr[num]);
-                    //!!!!!!!!!!!!!!
                     var txtNode = editor.entyDoc.createTextNode(tmpRange.extractContents().textContent);
                     tmpRange.insertNode(txtNode);
                     tmpRange.detach();
@@ -3460,7 +3536,7 @@ SinaEditor.ev.customEvent.editorOnladed = function(editor) {};
  */
 SinaEditor.ev.customEvent.editorSelectionChange = function(editor){
 	var _listener = function(e){
-		//SinaEditor.ev.stopEvent(e);
+		SinaEditor.ev.stopEvent(e);
 	    editor.entyWin.clearTimeout(editor._.editorHasSelectionBufferTimmer);
 	    editor._.editorHasSelectionBufferTimmer = editor.entyWin.setTimeout(function(){
             //虽然可以多选，但是只检测第一个
@@ -5649,12 +5725,12 @@ SinaEditor.plugins.add('flashBubble', function(){
             };
             bubble.id(did).onclick = function(){
                 editor.operation.save(editor);
+				
                 var children = node;
-                
-                SinaEditor.range.setStartBefore(editor.entyWin, node);
+				editor.focus();
+				SinaEditor.range.setStartBefore(editor.entyWin, node);
                 node.parentNode.removeChild(node);
                 SinaEditor.baseBubble.hiddenBubble();
-                editor.focus();
                 
                 editor.operation.save(editor);
             };
@@ -6332,6 +6408,7 @@ SinaEditor.plugins.add('historyUI',function(args){
 	 * @return  {Boolean} 存储成功或者失败
 	 */
 	editor.operation.saveData = function(){
+//debugger;
 		var newData = editor.entyBody.innerHTML;
 		if(oldData === newData) {
 			return false;
@@ -7162,7 +7239,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
             catch (e) {
             }
 			
-            if (SinaEditor.env.$IE) {
+            if (SinaEditor.env.$IE <= 6) {
 				try{
 					//图标被重复的请求
 					document.execCommand("BackgroundImageCache", false, true);
@@ -7183,7 +7260,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
 	            'ownerDocument': editor.entyDoc,
 	            'attributes': {
 					'type':'text/javascript',
-	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+(+new Date())
+	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+SinaEditor.version
 	            }
 	        });
 			
@@ -8308,7 +8385,7 @@ SinaEditor.plugins.add('showSource', function(args){
             filter();
             //if(args.formatter) {
 			
-			if (!SinaEditor.env.$IE) {
+			if (!SinaEditor.env.$IE >= 9) {
 				//IE6它受不起啊。。。有木有
 				editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
 			} else {

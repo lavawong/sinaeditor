@@ -4,13 +4,6 @@ console = {log:function(){}};
 //console = win.console;
 
 /*
-  DOM Ranges for Internet Explorer (m2)
-  
-  Copyright (c) 2009 Tim Cameron Ryan
-  Released under the MIT/X License
- */
- 
-/*
   Range reference:
     http://www.w3.org/TR/DOM-Level-2-Traversal-Range/ranges.html
     http://mxr.mozilla.org/mozilla-central/source/content/base/src/nsRange.cpp
@@ -25,13 +18,15 @@ console = {log:function(){}};
     http://dylanschiemann.com/articles/dom2Range/dom2RangeExamples.html
 */
 
-//[TODO] better exception support
+//[TODO] 未实现或未测试的方法：
+// cloneContents
+// detach
+// createContextualFragment
 
 (function () {
 /*
   DOM Range
  */
- 
 function DOMRange(_document,range) {
 	// save document parameter
 	this._document = _document;
@@ -82,6 +77,8 @@ DOMRange.prototype = {
 			var dup = range.duplicate();
 			var refRange = range.duplicate();
 			var objs = {};
+			var pointsWay = toHead ? 'StartToEnd' : 'EndToStart';
+			var pointsMethod = toHead ? 'moveStart' : 'moveEnd';
 			dup.collapse(toHead);
 			if(dup.parentElement().document !== this._document) {
 				//焦点到外面的情况
@@ -95,7 +92,7 @@ DOMRange.prototype = {
 				s = this.__getRefA('container'),
 				e = this.__getRefA('container'),
 				tmp = refRange.duplicate(),
-				offset=0,i=0,sun;
+				offset=0,i=0,sun,len;
 			for(;suns[i];i++) {
 				sun = suns[i];
 				if(sun.nodeType === 3) {
@@ -114,18 +111,17 @@ DOMRange.prototype = {
 					refRange.moveToElementText(sun);
 				}
 				if(refRange.inRange(dup)) {
+					//有可能会选中这样的情况：<ul><li>abc|def</li>|</ul>
+					//这样会导致在判断endContainer或者startContainer的时候，必须再加一个判断条件：
+					//不能超过节点内容的长度
 					objs.container = sun;
-					if(toHead) {
-						while(refRange.compareEndPoints('StartToEnd',dup)) {
-							offset++;
-							refRange.moveStart('character',1);
-						}
-					} else {
+					len = (sun.data || sun.value || sun.innerHTML).length;
+					if(!toHead) {
 						refRange.collapse(true);
-						while(refRange.compareEndPoints('EndToStart',dup)) {
-							offset++;
-							refRange.moveEnd('character',1);
-						}
+					}
+					while(refRange.compareEndPoints(pointsWay,dup) && offset < len) {
+						offset++;
+						refRange[pointsMethod]('character',1);
 					}
 					objs.offset = offset;
 					break;
@@ -157,7 +153,7 @@ DOMRange.prototype = {
 			}
 		}
 		
-		var mark = this._range.getBookmark();
+		//var mark = this._range.getBookmark();
 
 		var tmp = getConOffset.call(this,this._range,true);
 		this.startContainer = tmp.container || this._document.body.firstChild;
@@ -168,7 +164,7 @@ DOMRange.prototype = {
 		this.endContainer = tmp.container || this._document.body.firstChild;
 		this.endOffset = tmp.offset;
 		
-		this._range.moveToBookmark(mark);
+		//this._range.moveToBookmark(mark);
 		this._range.select();
 		var endTime = +new Date();
 		console.log('.......exec _refreshContainer time:'+(endTime-startTime));
@@ -410,8 +406,8 @@ DOMRange.prototype = {
 	},
 	extractContents: function () {
 		console.log('extractContents');
-		var fragement = document.createDocumentFragment(),
-			tmp = document.createElement('div'),
+		var fragement = this._document.createDocumentFragment(),
+			tmp = this._document.createElement('div'),
 			i=0;
 		tmp.innerHTML = this._range.htmlText;
 		while(tmp.childNodes[i]) {
@@ -631,28 +627,52 @@ DOMSelection.prototype = {
 	}
 };
 
-/*
-  scripting hooks
- */
-document.createRange = function () {
-	if(!__refRange) {
-		__refRange = new DOMRange(document);
-		return __refRange;
-	}
-	__refRange._refreshAll();
-	return __refRange;
-	//return new DOMRange(document);
-};
-
-var selection = new DOMSelection(document);
-window.getSelection = function () {
-	return selection;
-};
-
-window.Range = DOMRange;
-if(window.parent) {
-	window.parent.Range = DOMRange;
+//IE9 并不需要扩展
+var ie = /msie (\d+)\./.exec(navigator.userAgent.toLowerCase()) || [];
+var version = ie[1];
+if(!version || version < 6) {
+	//仅支持到IE6;
+	return;
 }
+if(version < 9) {
+	console.log('-----------------------------------------使用过度range');
+	/*绑定标准的调用方式*/
+	document.createRange = function () {
+		if(!__refRange) {
+			__refRange = new DOMRange(document);
+			return __refRange;
+		}
+		__refRange._refreshAll();
+		return __refRange;
+		//return new DOMRange(document);
+	};
 
-//[TODO] expose DOMRange/DOMSelection to window.?
+	var selection = new DOMSelection(document);
+	window.getSelection = function () {
+		return selection;
+	};
+
+	window.Range = DOMRange;
+	if(window.parent) {
+		window.parent.Range = DOMRange;
+	}
+} else {
+	console.log('-----------------------------------------使用原生range');
+	var selection = window.getSelection(),
+		ie9Range;
+
+	//IE9bug:弹出浮层导致节点丢失。
+	document.attachEvent('onbeforedeactivate', function () {
+		try {
+			ie9Range = selection.getRangeAt(0);
+		} catch(e){}
+	});
+	document.attachEvent('onactivate', function () {
+		if(ie9Range) {
+			selection.removeAllRanges();
+			selection.addRange(ie9Range);
+		}
+		ie9Range = null;
+	});
+}
 })();

@@ -40,7 +40,7 @@ SinaEditor.plugins.add('showSource', function(args){
             filter();
             //if(args.formatter) {
 			
-			if (!SinaEditor.env.$IE) {
+			if (!SinaEditor.env.$IE >= 9) {
 				//IE6它受不起啊。。。有木有
 				editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
 			} else {
