@@ -48,12 +48,12 @@ SinaEditor.plugins.add('flashBubble', function(){
             };
             bubble.id(did).onclick = function(){
                 editor.operation.save(editor);
+				
                 var children = node;
-                
-                SinaEditor.range.setStartBefore(editor.entyWin, node);
+				editor.focus();
+				SinaEditor.range.setStartBefore(editor.entyWin, node);
                 node.parentNode.removeChild(node);
                 SinaEditor.baseBubble.hiddenBubble();
-                editor.focus();
                 
                 editor.operation.save(editor);
             };

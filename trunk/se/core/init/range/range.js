@@ -398,16 +398,16 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			editor.focus();
 			return;
 		}
-		
+
 		var marks = _createBookmark(editor, {
             'range': range
         });
 		
 		//拆分块状元素，判断放在了函数里
         if(marks.end){
-			_breakParent.call(editor, marks.end);
+			marks.end = _breakParent.call(editor, marks.end);
 		}
-        _breakParent.call(editor, marks.start);
+        marks.start = _breakParent.call(editor, marks.start);
 		
         //if (range.toString()) {
             //在多行情况下，firefox有可能会选上结尾的br节点
@@ -529,7 +529,6 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			editor.focus();
             return;
         }
-        
         var marks = _createBookmark(editor, {
             'range': range
         });
@@ -541,8 +540,8 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			
 			if(!noBreak) {
 				//拆分块状元素，判断放在了函数里
-                _breakParent.call(editor, marks.end);
-                _breakParent.call(editor, marks.start);
+                marks.end = _breakParent.call(editor, marks.end);
+                marks.start = _breakParent.call(editor, marks.start);
 			}
             
             _getNextNode(marks.start, marks.end, function(currEle){
@@ -673,7 +672,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(!opts.range._document) {
 			clone = opts.range.cloneRange();
             clone.collapse(false);
-            clone.insertNode(spanEnd);
+			clone.insertNode(spanEnd);
 			clone = opts.range.cloneRange();
 	        clone.collapse(true);
 	        clone.insertNode(spanHead);
@@ -685,19 +684,19 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 				endN = opts.range.endOffset,
 				refA = opts.range.__getRefA(),
 				refEnd = end.nodeType === SinaEditor.NODETYPE.ELEMENT ? end.childNodes[endN] : null,
-				refStart = start.nodeType === SinaEditor.NODETYPE.ELEMENT ? start.childNodes[startN] : null;
-				
-			//if(end.nodeType === SinaEditor.NODETYPE.ELEMENT) {
-				//DOM节点
-				//end.insertBefore(spanEnd,refEnd);
-				//opts.range.__insertAfter(spanEnd,refEnd,end);
-			//} else {
-				//文本节点
-				//)))))))))))))))))))))))))))))))))))))))))))))bug:当有ul标签时，会把span放到UL的外面去，导致根本不能结束
-				clone = opts.range.cloneRange();
-	            clone.collapse(false);
-	            clone.insertNode(spanEnd);
-			//}
+				refStart = start.nodeType === SinaEditor.NODETYPE.ELEMENT ? start.childNodes[startN] : null,prev;
+
+			clone = opts.range.cloneRange();
+            clone.collapse(false);
+            clone.insertNode(spanEnd);
+			
+			//end要做一次修正，有可能出现：
+			//<ul><li></li><span id="end"></span></ul>的情况。
+			prev = spanEnd.previousSibling;
+			
+			if(prev && prev.tagName && 'LI OL'.indexOf(prev.tagName.toUpperCase() != -1)) {
+				prev.appendChild(spanEnd);
+			}
 				
 			if(refStart) {
 				//DOM节点
@@ -708,17 +707,6 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		        clone.collapse(true);
 		        clone.insertNode(spanHead);
 			}
-			/*
-			var dup = opts.range._range.duplicate();
-			dup.collapse(true);
-			dup.pasteHTML(spanHead.outerHTML);
-			dup = opts.range._range.duplicate();
-			dup.collapse(false);
-			dup.pasteHTML(spanEnd.outerHTML);
-			spanHead = opts.range._document.getElementById('start');
-			spanEnd = opts.range._document.getElementById('end');
-			*/
-			
 		}
     
         opts.range.setStartAfter(spanHead);
@@ -743,14 +731,91 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         var parent = domUtil.getBlockParent(child);
         if (!parent) {
             //父元素就是块状元素，没有必要拆分
-            return false;
+            return child;
         }
         
         var range = _createRange(this);
 		if(range._range) {
-			//[TODO]关闭IE部分的检查
 			//extractContents会严重导致startContainer或者endContainer丢失，但又不能及时更新通知
-			return false;
+			//非常讨厌的textRange,当没有节点包裹时，标签节点也不会被包围住。所以得再套上一层。
+			//bug:<strong>ab|cde|fg</strong> -> 去加粗操作，失败。
+			//debugger;
+			var doc = parent.document,
+				rRange = range._range,
+				pPar = parent.parentNode,
+				cPar = child.parentNode,
+				sRef = range.__getRefA(),
+				sRef2 = range.__getRefA(),
+				eRef = range.__getRefA(),
+				eRef2 = range.__getRefA(),
+				refNode = range.__getRefA(),
+				dupMove = rRange.duplicate(),
+				dupRef = rRange.duplicate(),
+				frage = parent.document.createDocumentFragment(),
+				tmp = doc.createElement('div'),refID;
+				
+			sRef.id = 'refStart';
+			eRef.id = 'refEnd';
+			refNode.id = 'refNode';
+
+			if(child.id === 'start') {
+				//开始部分
+				pPar.insertBefore(sRef,parent);
+				cPar.insertBefore(eRef,child);
+				refID = 'start';
+				
+				sRef.parentNode.insertBefore(sRef2,sRef);
+				range.__insertAfter(eRef2,eRef);
+				
+				sRef2.parentNode.insertBefore(refNode,sRef2);
+			} else {
+				//结束部分
+				range.__insertAfter(sRef,child,cPar);
+				range.__insertAfter(eRef,parent,pPar);
+				refID = 'end';
+				
+				sRef.parentNode.insertBefore(sRef2,sRef);
+				range.__insertAfter(eRef2,eRef);
+				
+				range.__insertAfter(refNode,eRef2);
+			}
+			
+			dupRef.moveToElementText(sRef2);
+			dupMove.moveToElementText(sRef2);
+			dupRef.setEndPoint('StartToEnd',dupMove);
+			dupMove.moveToElementText(eRef2);
+			dupRef.setEndPoint('EndToStart',dupMove);
+			
+			sRef.parentNode.removeChild(sRef2);
+			eRef.parentNode.removeChild(eRef2);
+			
+			tmp.innerHTML = dupRef.htmlText;
+			frage.appendChild(tmp);
+			while(tmp.childNodes[0]) {
+				frage.appendChild(tmp.childNodes[0]);
+			}
+			frage.removeChild(tmp);
+			dupRef.pasteHTML('');
+			refNode.parentNode.insertBefore(frage,refNode);
+			refNode.parentNode.removeChild(refNode);
+			
+			sRef = doc.getElementById('refStart');
+			sRef.parentNode.removeChild(sRef);
+			eRef = doc.getElementById('refEnd');
+			eRef.parentNode.removeChild(eRef);
+			
+			if (refID === 'start') {
+				//开始部分
+				pPar.insertBefore(child,child.parentNode);
+			} else {
+				//结束部分
+				range.__insertAfter(child,child.parentNode);
+			}
+			
+			//修复Container和Offset
+			range._refreshAll();
+			
+			return doc.getElementById(refID);
 		}
         // We'll be extracting part of this element, so let's use our
         // range to get the correct piece.
@@ -763,7 +828,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
         // Re-insert the extracted piece after the element.
         domUtil.insertAfter(docFrag, child);
 		
-		return true;
+		return child;
     };
     
     /**
@@ -915,7 +980,6 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 						&& !arr[num].style.cssText) {
                     var tmpRange = _createRange(editor);
                     tmpRange.selectNode(arr[num]);
-                    //!!!!!!!!!!!!!!
                     var txtNode = editor.entyDoc.createTextNode(tmpRange.extractContents().textContent);
                     tmpRange.insertNode(txtNode);
                     tmpRange.detach();

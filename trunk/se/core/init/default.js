@@ -4,6 +4,8 @@ if (!window.SinaEditor) {
     SinaEditor = {};
 }
 
+SinaEditor.version = 1.0;
+
 if (!SinaEditor.CONF) {
     SinaEditor.CONF = {};
 }

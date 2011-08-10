@@ -55,7 +55,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
             catch (e) {
             }
 			
-            if (SinaEditor.env.$IE) {
+            if (SinaEditor.env.$IE <= 6) {
 				try{
 					//图标被重复的请求
 					document.execCommand("BackgroundImageCache", false, true);
@@ -76,7 +76,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
 	            'ownerDocument': editor.entyDoc,
 	            'attributes': {
 					'type':'text/javascript',
-	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+(+new Date())
+	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+SinaEditor.version
 	            }
 	        });
 			

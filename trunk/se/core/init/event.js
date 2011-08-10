@@ -130,14 +130,14 @@ SinaEditor.ev = {};
 	 * @param {Object} ev 事件参数
 	 */
 	ns.stopEvent = function(ev){
-		ev.cancelBubble = true;
-		ev.returnValue = false;
-	};
-	if (!SinaEditor.env.$IE) {
-	    ns.stopEvent = function(ev){
-			ev.preventDefault();
-			ev.stopPropagation();
-	    };
+		ev.preventDefault();
+		ev.stopPropagation();
+    };
+	if (SinaEditor.env.$IE < 9) {
+		ns.stopEvent = function(ev){
+			ev.cancelBubble = true;
+			ev.returnValue = false;
+		};
 	}
 	
 	/**

@@ -20,10 +20,11 @@ if(!SinaEditor.env) {
 (function(ns){
 	var _ua = navigator.userAgent.toLowerCase();
 	/**
-	 * IE系列浏览器
+	 * IE系列浏览器，并返回版本号
 	 * @name SinaEditor.env.$IE
 	 */
-	ns.$IE = /msie/.test(_ua);
+	var ieArr = /msie (\d+)\./.exec(_ua) || [];
+	ns.$IE = ieArr[1];
 	/**
 	 * opear系列浏览器
 	 * @name SinaEditor.env.$OPERA
@@ -40,11 +41,6 @@ if(!SinaEditor.env) {
 	 */
 	ns.$WEBKIT = /applewebkit/.test(_ua);
 	/**
-	 * IE5浏览器
-	 * @name SinaEditor.env.$IE5
-	 */
-	ns.$IE5 = /msie 5 /.test(_ua);
-	/**
 	 * IE6浏览器
 	 * @name SinaEditor.env.$IE6
 	 */
@@ -59,6 +55,11 @@ if(!SinaEditor.env) {
 	 * @name SinaEditor.env.$IE8
 	 */
 	ns.$IE8 = /msie 8/.test(_ua);
+	/**
+	 * IE9浏览器
+	 * @name SinaEditor.env.$IE8
+	 */
+	ns.$IE9 = /msie 9/.test(_ua);
 	/**
 	 * XP系统
 	 * @name SinaEditor.env.$winXP
