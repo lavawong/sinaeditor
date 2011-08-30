@@ -32,7 +32,8 @@ SinaEditor.plugins.add('bold',function(args){
 		if(isBold) {
 			console.log('执行去加粗操作');
 			SinaEditor.range.removeStyle(editor, {
-	            'useTagName': ['strong','b']
+	            'useTagName': ['strong','b','span'],
+				'style' : 'fontWeight'
 	        });
 			btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
 		} else {

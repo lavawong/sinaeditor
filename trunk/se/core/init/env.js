@@ -112,7 +112,7 @@ if(!SinaEditor.env) {
 		var domain = document.domain,
 			hostname = window.location.hostname;
 
-		return this.ie &&
+		return this.$IE &&
 			domain !== hostname &&
 			domain !== ( '[' + hostname + ']' );
 	}());

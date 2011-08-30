@@ -10,7 +10,7 @@ SinaEditor.plugins.add('historyUIBtn',function(args){
 		,clickedClass : 'ico_quicksave_3'
 		,mouseoverClass : 'ico_quicksave_2'
 		,state : SinaEditor.BUTTONSTATE.NORMAL
-		,group : 'richdata'
+		,group : 'redoAndUndo'
 	};
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);

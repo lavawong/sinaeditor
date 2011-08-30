@@ -19,7 +19,7 @@ SinaEditor.plugins.add('showSource', function(args){
 		editor.entyArea.style.height = editor.enty.offsetHeight + 'px';
 	}
     
-    if (!editor.customerBtn) {
+    if (!args.customerBtn) {
         editor.callPlugin({
             'name': 'showSourceBtn',
             'args': args
@@ -66,7 +66,10 @@ SinaEditor.plugins.add('showSource', function(args){
         'initialize': function(){
             editor.entyArea.style.display = 'none';
             editor.enty.style.display = '';
-            editor.focus();
+            //editor.focus();
+			if(editor.entyArea.value) {
+				editor.operation.swapData(false);
+			}
             SinaEditor.redoManager.addEditor(editor);
         }
     };

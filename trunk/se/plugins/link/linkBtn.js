@@ -12,7 +12,7 @@ SinaEditor.plugins.add('linkBtn',function(args){
         clickedClass: 'ico_link_3',
         mouseoverClass: 'ico_link_2',
         state: SinaEditor.BUTTONSTATE.DISABLED,
-        group: 'common'
+        group: 'richdata'
     };
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);

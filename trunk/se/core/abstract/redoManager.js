@@ -191,7 +191,7 @@ SinaEditor.$abstract.redoManager = function(){
 		
 		var curr = element;
 		var parent = element.parentNode;
-		while(parent && parent.nodeType !== SinaEditor.NODETYPE.HTMLELEMENT) {
+		while(parent && parent.tagName.toUpperCase() !== "HTML") {
 			
 			var ch = parent.childNodes;
 			var i;

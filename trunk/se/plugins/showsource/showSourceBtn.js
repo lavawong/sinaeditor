@@ -21,7 +21,7 @@ SinaEditor.plugins.add('showSourceBtn',function(args){
         mouseoverClass: 'ico_showsrc_2',
         state: SinaEditor.BUTTONSTATE.DISABLED,
 		editorChangeType:'source',
-        group: 'common'
+        group: 'viewSource'
     };
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
