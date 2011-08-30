@@ -1,7 +1,7 @@
 /****************** 编辑器专有样式 *********************/
 
 .se_fontfamily_bubble {
-	background-color:#E0ECFF;
+	background-color:#FAFAFA;
 	font-family:Arial,sans-serif,sans;
 	font-size:13px;
 	position:absolute;
@@ -94,9 +94,13 @@
 	margin-right:6px;
 	padding:2px;
 	float: left;
+	display:inline;
+	min-height:31px;
+	_height:31px;
 	zoom:1;
 }
-
+.se_ico_group div,.se_ico_group div div{width:22px;height:22px;display:inline; zoom:1;}
+.se_ico_group div{margin-bottom:5px;}
 .se_ico_group:after {content:"";display:block; clear:both;}
 
 .se_ico_group div {
@@ -142,7 +146,7 @@
 
 /* 1正常,2激活,3点击,4禁止 */
 /*专业版*/ 
-.pro_tools { font-size:12px;padding:6px 12px;background:#ECECEC;background: -moz-linear-gradient(top, #EFEFEE, #ECECEC 50%);background: gradient(top, #EFEFEE, #ECECEC 50%);background: -webkit-gradient(linear, 0 0, 0 50%, from(#ECECEC), to(#EFEFEE));zoom:1;}
+.pro_tools { font-size:12px;padding:3px 12px;background:#ECECEC;background: -moz-linear-gradient(top, #EFEFEE, #ECECEC 50%);background: gradient(top, #EFEFEE, #ECECEC 50%);background: -webkit-gradient(linear, 0 0, 0 50%, from(#ECECEC), to(#EFEFEE));zoom:1;border-top:1px solid #989898;border-left:1px solid #989898;border-right:1px solid #989898;}
 .pro_tools:after {content:""; display:block; clear:both;}
 .pro_tools .ico_paste_1,
 .pro_tools .ico_cut_1,
@@ -282,11 +286,11 @@
 
 .pro_tools .ico_redo_1{background-position: -2449px 0; margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_undo_1{background-position: -2357px 0; margin-left: 4px; margin-top: 3px; width: 22px; height: 22px;}
-.pro_tools .ico_family_1{background-position: -246px -1px; margin-left: 4px; margin-top: 5px; width: 81px; height: 20px;}
-.pro_tools .ico_fontsize_1{background-position: -487px -1px; margin-left: 4px; margin-top: 5px; width: 52px; height: 20px;}
-.pro_tools .ico_bold_1{background-position: -610px 0;  margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
-.pro_tools .ico_italic_1{background-position: -702px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
-.pro_tools .ico_underline_1{background-position: -792px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
+.pro_tools .ico_family_1{background-position: -246px 0; margin-left: 4px; margin-top: 5px; width: 81px; height: 22px;}
+.pro_tools .ico_fontsize_1{background-position: -487px 0; margin-left: 4px; margin-top: 5px; width: 52px; height: 22px;}
+.pro_tools .ico_bold_1{background-position: -609px 0;  margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
+.pro_tools .ico_italic_1{background-position: -701px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
+.pro_tools .ico_underline_1{background-position: -793px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_forecolor_1{background-position: -885px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;  }
 .pro_tools .ico_hilitecolor_1{background-position: -977px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px; }
 .pro_tools .ico_link_1{background-position: -1069px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
@@ -307,8 +311,8 @@
 
 .pro_tools .ico_redo_2{background-position: -2380px 0; margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_undo_2{background-position: -2288px 0; margin-left: 4px; margin-top: 3px; width: 22px; height: 22px;}
-.pro_tools .ico_family_2{background-position: 0 -1px; margin-left: 4px; margin-top: 5px; width: 81px; height: 20px;}
-.pro_tools .ico_fontsize_2{background-position: -328px -1px; margin-left: 4px; margin-top: 5px; width: 52px; height: 20px;}
+.pro_tools .ico_family_2{background-position: 0 0; margin-left: 4px; margin-top: 5px; width: 81px; height: 22px;}
+.pro_tools .ico_fontsize_2{background-position: -328px 0; margin-left: 4px; margin-top: 5px; width: 52px; height: 22px;}
 .pro_tools .ico_bold_2{background-position: -540px 0;  margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_italic_2{background-position: -632px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_underline_2{background-position: -724px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
@@ -331,8 +335,8 @@
 
 .pro_tools .ico_redo_3{background-position: -2403px 0; margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_undo_3{background-position: -2311px 0; margin-left: 4px; margin-top: 3px; width: 22px; height: 22px;}
-.pro_tools .ico_family_3{background-position: -82px -1px; margin-left: 4px; margin-top: 5px; width: 81px; height: 20px;}
-.pro_tools .ico_fontsize_3{background-position: -381px -1px; margin-left: 4px; margin-top: 5px; width: 52px; height: 20px;}
+.pro_tools .ico_family_3{background-position: -82px 0; margin-left: 4px; margin-top: 5px; width: 81px; height: 22px;}
+.pro_tools .ico_fontsize_3{background-position: -381px 0; margin-left: 4px; margin-top: 5px; width: 52px; height: 22px;}
 .pro_tools .ico_bold_3{background-position: -563px 0;  margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_italic_3{background-position: -655px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_underline_3{background-position: -747px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
@@ -355,8 +359,8 @@
 
 .pro_tools .ico_redo_4{background-position: -2426px 0; margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_undo_4{background-position: -2334px 0; margin-left: 4px; margin-top: 3px; width: 22px; height: 22px;}
-.pro_tools .ico_family_4{background-position: -164px -1px; color:#FFFFFF;margin-left: 4px; margin-top: 5px; width: 81px; height: 20px;}
-.pro_tools .ico_fontsize_4{background-position: -434px -1px; margin-left: 4px; margin-top: 5px; width: 52px; height: 20px;}
+.pro_tools .ico_family_4{background-position: -164px 0; color:#FFFFFF;margin-left: 4px; margin-top: 5px; width: 81px; height: 22px;}
+.pro_tools .ico_fontsize_4{background-position: -434px 0; margin-left: 4px; margin-top: 5px; width: 52px; height: 22px;}
 .pro_tools .ico_bold_4{background-position: -587px 0;  margin-left: 4px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_italic_4{background-position: -679px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
 .pro_tools .ico_underline_4{background-position: -769px 0; margin-left: 1px; margin-top: 4px; width: 22px; height: 22px;}
