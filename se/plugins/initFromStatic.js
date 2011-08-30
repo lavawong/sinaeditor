@@ -96,8 +96,10 @@ SinaEditor.plugins.add('initFromStatic',function(args){
         }
     }
     
+	var customDomain = document.domain;
+
     var func = 'document.open();' +
-			    (SinaEditor.env.isCustomDomain ? 'document.domian="' + document.domain + '";' : '') +
+			    (SinaEditor.env.isCustomDomain ? 'document.domain="' + customDomain + '";' : '') +
 			    'document.close();';
     
     var iframe = SinaEditor.util.dom.createDomFromHTML('<iframe' +
@@ -110,5 +112,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
 			    '></iframe>');
     editor.enty = iframe;
     SinaEditor.ev.add(iframe, 'load', init);
-    args.parent.appendChild(iframe);
+	setTimeout(function(){
+		args.parent.appendChild(iframe);
+	},0);
 });
