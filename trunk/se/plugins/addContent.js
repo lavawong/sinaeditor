@@ -16,9 +16,13 @@ SinaEditor.plugins.add('addContent',function(args){
 		if(!range.collapsed) {
 			range.deleteContents();
 		}
+		var focNode = node;
+		if(node.nodeType === 11) {
+			focNode = node.lastChild;
+		}
 		range.insertNode(node);
 		if(!focus) {
-			_focusAfter(node,range);
+			_focusAfter(focNode,range);
 		}
 		editor.operation.save(editor);
 	};
