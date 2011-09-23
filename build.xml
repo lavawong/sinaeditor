@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <project default="build" basedir=".">
 	<property name="src.dir"  value="se"/>
-	<property name="target.name"  value="sinaeditor.js"/>
+	<!-- <property name="target.name"  value="sinaeditor.js"/> -->
+	<property name="target.name"  value="E:/he/blog7/xblog/editor/sinaeditor.js"/>
 	
 	<target name="build" depends="clean">
 		<concat destfile="${target.name}" encoding="UTF-8"  outputencoding="UTF-8" append="true">
@@ -18,22 +19,42 @@
 			<fileset file="${src.dir}/core/abstract/*.js" />
 			<!-- 初始化插件资源 -->
 			<!--<fileset file="${src.dir}/plugins/*.js" />-->
+			<!--
 			<fileset dir="${src.dir}">
 				<include name="plugins/**/*.js" />
 			</fileset>
+			-->
+			<fileset file="${src.dir}/plugins/qingAreaEditor/*.js" />
+			<fileset file="${src.dir}/plugins/bold/*.js" />
+			<fileset file="${src.dir}/plugins/qingUpImg/*.js" />
+			<fileset file="${src.dir}/plugins/qingHistory/*.js" />
+			<fileset file="${src.dir}/plugins/justifycenter/*.js" />
+			<fileset file="${src.dir}/plugins/justifyleft/*.js" />
+			<fileset file="${src.dir}/plugins/justifyright/*.js" />
+			<fileset file="${src.dir}/plugins/qingFilter.js" />
+			<fileset file="${src.dir}/plugins/showsource/*.js" />
+			<fileset file="${src.dir}/plugins/redo/*.js" />
+			<fileset file="${src.dir}/plugins/undo/*.js" />
+			<fileset file="${src.dir}/plugins/redoManager/*.js" />
+			<fileset file="${src.dir}/plugins/addContent.js" />
+			<fileset file="${src.dir}/plugins/initFromStatic.js" />
+			<fileset file="${src.dir}/plugins/submit.js" />
+			<fileset file="${src.dir}/plugins/qingMobileSubmit/qingMobileSubmit.js" />
+			
+			<fileset file="${src.dir}/plugins/link/*.js" />
+			<fileset file="${src.dir}/plugins/qingLink/*.js" />
 			<!-- 初始化实例类  -->
 			<fileset file="${src.dir}/core/abstract/baseEditor.js" />
-			
-			
-			<!-- 弹出的浮层 -->
 			<fileset file="${src.dir}/core/_enty/*.js" />
-			<fileset file="${src.dir}/core/_enty/editor/normalEditor.js" />
+			<fileset file="${src.dir}/core/_enty/editor/*.js" />
+			<!-- 弹出的浮层 -->
 			<fileset file="${src.dir}/core/_enty/dialog/renderer/*.js" />
 			<fileset file="${src.dir}/core/_enty/dialog/dragger/*.js" />
 			<fileset file="${src.dir}/core/_enty/dialog/parent/*.js" />
 			<fileset file="${src.dir}/core/_enty/dialog/*.js" />
 			<fileset file="${src.dir}/core/_enty/dialog/config/moduleDialog.js" />
 			<fileset file="${src.dir}/core/_enty/dialog/config/dialogConfig.js" />
+			
 		</concat>
 	</target>
 	

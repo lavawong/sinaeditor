@@ -6,7 +6,7 @@ SinaEditor.plugins.add('link',function(args){
     
     if (!args.customerPanel) {
        editor.callPlugin({
-			'name' : 'linkPanel',
+			'name' : 'qingLinkPanel',
 			'args' : args
 		});
     }
@@ -63,7 +63,28 @@ SinaEditor.plugins.add('link',function(args){
 	            properties: {
 	                'target': '_blank'
 	            }
-	        });
+	        }),
+				zeroBlank = editor.entyDoc.createDocumentFragment(),
+				tmp = editor.entyDoc.createElement('div');
+			tmp.innerHTML = SinaEditor.env.$IE ? '&nbsp;' : '&#8203;';
+			//zeroBlank.appendChild(tmp.firstChild);
+			zeroBlank = tmp.firstChild;
+			link = link.indexOf('://') === -1 ? 'http://'+link : link;
+
+			try {
+				a.href = encodeURI(link);
+				if(window._linkElm) {
+					if(window._linkElm.parentNode && window._linkElm.parentNode.href) {
+						window._linkElm.parentNode.href = a.href;
+						return;
+					}
+					window._linkElm.parentNode.insertBefore(a,window._linkElm);
+					a.appendChild(window._linkElm);
+					window._linkElm = null;
+					editor.focus();
+					return;
+				}
+			} catch(e){trace(e)}
 
 	        if (!range || range && range.collapsed) {
 	            //2b,c.添加链接。 
@@ -72,10 +93,18 @@ SinaEditor.plugins.add('link',function(args){
 	            //range ? range.insertNode(a) : editor.entyBody.appendChild(a);
 				if(range) {
 					range.insertNode(a);
+					if (!SinaEditor.env.$IE) {
+						SinaEditor.util.dom.insertAfter(zeroBlank,a);
+						range.selectNodeContents(zeroBlank);
+						range.collapse(false);
+						editor.focus();
+					} else {
+						range.selectNodeContents(a);
+					}
 				} else {
 					editor.entyBody.appendChild(a);
+					range.selectNodeContents(a);
 				}
-				range.selectNodeContents(a);
 				SinaEditor.range.applyRanges(editor.entyWin, range);
 	        } else {
 				//1a：检测选区中的a标签，全部清除。
@@ -91,14 +120,32 @@ SinaEditor.plugins.add('link',function(args){
 					//之前的操作破坏了选区，需要重新获取(有些浏览器的currentRange不是同一个引用)
 					range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
 					try {
-						//在跨节点时会报错
-						range.surroundContents(a);
+						if (SinaEditor.env.$IE) {
+							editor.entyDoc.execCommand('link',false,encodeURI(link));
+						} else {
+							//在跨节点时会报错
+							range.surroundContents(a);
+						}
 					} catch(e) {
 						var content = range.extractContents();
 						a.appendChild(content);
 						range.insertNode(a);
 					}
-					range.selectNodeContents(a);
+					try {
+						if(SinaEditor.env.$IE) {
+							if(a.childNodes[0].tagName.toUpperCase() === 'P') {
+								SinaEditor.util.dom.insertAfter(zeroBlank,a);
+								range.selectNodeContents(zeroBlank);
+								range.collapse(false);
+							}
+						} else {
+							SinaEditor.util.dom.insertAfter(zeroBlank,a);
+							range.selectNodeContents(zeroBlank);
+							range.collapse(false);
+						}
+					} catch(e){}
+					//range.selectNodeContents(a);
+					editor.focus();
 					SinaEditor.range.applyRanges(editor.entyWin, range);
 					//#BLOGBUG-12345 转中文不给力啊。
 					//editor.entyDoc.execCommand('createLink',false,encodeURIComponent(link));

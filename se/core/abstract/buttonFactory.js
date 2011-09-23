@@ -83,7 +83,7 @@ SinaEditor.$abstract.ButtonFactory = function(){
 				var group,gid,i,j;
 				for(i=0; groups[i]; i++) {
 					group = groups[i];
-					var gSpan = SinaEditor.util.dom.createDom('div',{'properties':{'className':'se_ico_group','id':groupid}});
+					var gSpan = SinaEditor.util.dom.createDom('li',{'properties':{'id':groupid}});
 					for(id in group) {
 						for(j=0; group[id][j]; j++) {
 							gSpan.appendChild(group[id][j].$);
@@ -93,7 +93,7 @@ SinaEditor.$abstract.ButtonFactory = function(){
 				}
 			},{once:true});
 		} else {
-			var group = document.getElementById(groupid) || SinaEditor.util.dom.createDom('div',{'properties':{'className':'se_ico_group','id':groupid}});
+			var group = document.getElementById(groupid) || SinaEditor.util.dom.createDom('li',{'properties':{'id':groupid}});
 			group.appendChild(btn.$);
 			document.getElementById(editor.option.toolBase).appendChild(group);
 		}

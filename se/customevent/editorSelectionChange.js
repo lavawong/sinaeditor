@@ -7,8 +7,14 @@
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.editorSelectionChange = function(editor){
+	if(!editor.entyDoc) {
+		return;
+	}
 	var _listener = function(e){
-		SinaEditor.ev.stopEvent(e);
+		if(SinaEditor.env.$IE) {
+			//在选区内点击，不能折叠...
+			SinaEditor.ev.stopEvent(e);
+		}
 	    editor.entyWin.clearTimeout(editor._.editorHasSelectionBufferTimmer);
 	    editor._.editorHasSelectionBufferTimmer = editor.entyWin.setTimeout(function(){
             //虽然可以多选，但是只检测第一个
@@ -31,7 +37,7 @@ SinaEditor.ev.customEvent.editorSelectionChange = function(editor){
             }
             editor._.oldRange = ranges;
         }, 400);
-		return false;
+		//return false;
     };
     
     var _handleEvent = function(e, range){

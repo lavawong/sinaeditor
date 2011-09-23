@@ -4,7 +4,7 @@ if (!window.SinaEditor) {
     SinaEditor = {};
 }
 
-SinaEditor.version = 1.0;
+SinaEditor.version = 2.0;
 
 if (!SinaEditor.CONF) {
     SinaEditor.CONF = {};
@@ -348,12 +348,14 @@ SinaEditor.TOOLCONF.FONTSIZECONF = [{
 }];
 
 //链接的弹出浮层
-SinaEditor.TOOLCONF.linkTemplate = ['<div class="linkItemContent">',
+SinaEditor.TOOLCONF.qingLinkTemplate = ['<div><span>链接地址：</span><input type="text" id="#{link}" /></div>',
+										'<div id="#{hidden}" style="display:none"><span>文字：</span><input id="#{text}" type="text" /></div>'].join('');
+['<div class="linkItemContent">',
 	'<div class="row1" id="#{hidden}" style="display:none">文字:',
 		'<input class="fm1" id="#{text}">',
 	'</div>',
 	'<div class="row2">链接:',
-		'<input value="http://" class="fm1" id="#{link}">',
+		'<input value="" class="fm1" id="#{link}">',
 	'</div>',
 	'<div class="row3">',
 		'<a onclick="return false" id="#{ok}" href="#" class="SG_aBtn SG_aBtnB"><cite>确定</cite></a>',

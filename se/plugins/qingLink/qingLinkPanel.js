@@ -1,12 +1,11 @@
 
-//插入链接的弹出浮层
-SinaEditor.plugins.add('linkPanel',function(args){
+//插入链接的弹出浮层，专为轻博客重写的编辑器
+SinaEditor.plugins.add('qingLinkPanel',function(args){
     var editor = this;
 	
     var linkPanel = SinaEditor.winDialog.create({
         title: '添加链接',
-		//老的一去不复返了
-        //content: SinaEditor.TOOLCONF.linkTemplate,
+        content: SinaEditor.TOOLCONF.qingLinkTemplate,
 		funcClose:function(){
 			_back();
 		}
@@ -14,7 +13,7 @@ SinaEditor.plugins.add('linkPanel',function(args){
 	
     linkPanel.setMiddle();
     linkPanel.setFixed(true);
-    
+    linkPanel.nodes.content.className = 'editLink';
     var okNode = linkPanel.nodes.ok;
     var cancelNode = linkPanel.nodes.cancel;
     var textNode = linkPanel.nodes.text;
@@ -47,11 +46,13 @@ SinaEditor.plugins.add('linkPanel',function(args){
             "element": okNode,
             "events": {
                 'click': function(){
-					editor.operation.link({
-						'link' : linkNode.value,
-						'str' : textNode.value,
-						'elm' : _tmpNode
-					});
+					if(SinaEditor.util.trim(linkNode.value)) {
+						editor.operation.link({
+							'link' : linkNode.value,
+							'str' : textNode.value,
+							'elm' : _tmpNode
+						});
+					}
 					_back();
 					linkPanel.hidden();
                 }
@@ -64,6 +65,26 @@ SinaEditor.plugins.add('linkPanel',function(args){
         			linkPanel.hidden();
                 }
             }
-        }]
+        },{
+			"element": linkNode,
+            "events": {
+                'focus': function(){
+					this.className = 'focus';
+                },
+				'blur': function(){
+					this.className = '';
+                }
+            }
+		},{
+			"element": textNode,
+            "events": {
+                'focus': function(){
+					this.className = 'focus';
+                },
+				'blur': function(){
+					this.className = '';
+                }
+            }
+		}]
     };
 });

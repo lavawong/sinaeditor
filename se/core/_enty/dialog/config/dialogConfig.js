@@ -81,7 +81,7 @@ SinaEditor.winDialog={};
 		].join(""),
 				
 				
-		customs:[
+		customs1:[
 			'<table id="#{panel}" class="CP_w">',
 				'<thead id="#{titleBar}">',
 					'<tr>',
@@ -111,6 +111,20 @@ SinaEditor.winDialog={};
 					'</tr>',
 				'</tbody>',
 			'</table>'
+		].join(""),
+		
+		customs:[
+			'<div class="pops" id="#{panel}">',
+				'<div class="hd"></div>',
+				'<div class="bd">',
+					'<div class="tit" id="#{titleBar}"><span id="#{titleName}">提示标题</span></div>',
+					'<div class="con elink"><a href="#" id="#{btnClose}" onclick="return false;" title="关闭" class="close">关闭</a>',
+						'<div id="#{content}"></div>',
+						'<div class="submit"> <a onclick="return false" id="#{ok}" href="#" class="btn"><span>确定</span></a> <a onclick="return false" id="#{cancel}" href="#" class="btn"><span>取消</span></a> </div>',
+					'</div>',
+				'</div>',
+				'<div class="ft"></div>',
+			'</div>'
 		].join("")
 	};
 	

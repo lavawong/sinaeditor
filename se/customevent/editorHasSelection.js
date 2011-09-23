@@ -6,6 +6,9 @@
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.editorHasSelection = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	function doo() {
 		editor.entyWin.clearTimeout(editor._.editorHasSelectionBufferTimmer);
         editor._.editorHasSelectionBufferTimmer = editor.entyWin.setTimeout(function(){

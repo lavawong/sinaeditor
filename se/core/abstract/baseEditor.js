@@ -101,22 +101,6 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 	//已有插件列表
 	this._jobTableIndex = {};
 	/**
-	 * 实体对象，即编辑器的iframe节点。
-	 */
-	this.enty = null;
-	/**
-	 * iframe的window对象引用。
-	 */
-	this.entyWin = null;
-	/**
-	 * iframe的document对象引用。
-	 */
-	this.entyDoc = null;
-	/**
-	 * iframe的body节点引用。
-	 */
-	this.entyBody = null;
-	/**
 	 * 编辑器的textarea节点引用。
 	 */
 	this.entyArea = null;
@@ -196,35 +180,45 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 			i++;
             if (i >= joblen) {
                 clearInterval(interNum);
-                interNum = null;
+				interNum = null;
+				if(joblen === 0) {
+					_this._initCustomEvent();
+					_this.setState(SinaEditor.STATE.CREATED);
+					_this.setState(SinaEditor.STATE.EDITING);
+				}
                 SinaEditor.ev.fire(_this, 'editorOnladed');
                 return;
             }
 			if(_this.entyWin) {
-				
-				if(!_this.hasAddEvent) {
-					_this.hasAddEvent = true;
-					var ev = null;
-					//这里来初始化事件
-					for(ev in SinaEditor.ev.customEvent) {
-						if(_this.option.eventBlackList.indexOf(ev) < 0) {
-							SinaEditor.ev.$regEvent(ev,_this);
-						} else {
-							console.log(_this.option.id+'在黑名单中：'+ev);
-						}
-					}
-				}
+				_this._initCustomEvent();
 				
 				_this.callPlugin(jobs[i]);
 				
 				_this.setState(SinaEditor.STATE.CREATED);
 				_this.setState(SinaEditor.STATE.EDITING);
+				
 			} else {
 				console.log("等一下");
 				i--;
 			}
         }, 10);
-    },
+    }
+	
+	,_initCustomEvent : function(){
+		if(!this.hasAddEvent) {
+			this.hasAddEvent = true;
+			var ev = null;
+			//这里来初始化事件
+			for(ev in SinaEditor.ev.customEvent) {
+				if(this.option.eventBlackList.indexOf(ev) < 0) {
+					SinaEditor.ev.$regEvent(ev,this);
+				} else {
+					console.log(this.option.id+'在黑名单中：'+ev);
+				}
+			}
+		}
+	}
+	
     /**
      * 单独后执行某个插件。
      * @memberOf SinaEditor.$abstract.baseEditor#
@@ -247,7 +241,11 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 	 * 	</tr>
      * </table>
      */
-    callPlugin: function(pluginConf){
+    ,callPlugin: function(pluginConf){
+		if(!pluginConf) {
+			return;
+		}
+		console.log("callPlugin:"+pluginConf.name);
 		var getTime = function(){
             return new Date().valueOf();
         };
@@ -311,13 +309,6 @@ SinaEditor.$abstract.baseEditor = function(oOption){
         }
     }
 	/**
-     * 焦点集中到编辑器中。
-     * @memberOf SinaEditor.$abstract.baseEditor#
-     */
-	,focus : function() {
-		this.entyWin.focus();
-	}
-	/**
      * 设置编辑器的状态。设置后，会触发自定义事件editorStateChange。
      * @memberOf SinaEditor.$abstract.baseEditor#
      * @param state {int} 要设置的编辑器的状态可以设置：<br>
@@ -352,8 +343,10 @@ SinaEditor.createEditor = function(conf){
     //    job.add(conf['filter']);
     //}
 	var job = new (eval('(' + conf.editorName + ')'))(conf);
-	var pName = conf.plugns,i;
-	job.add(conf.initType);
+	var pName = conf.plugns || [],i;
+	if(conf.initType) {
+		job.add(conf.initType);
+	}
 	if (conf.filter) {
         job.add(conf.filter);
     }
