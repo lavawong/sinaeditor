@@ -38,7 +38,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(!count) {
 			var range = win.document.createRange();
 			if(!win.document.body.firstChild) {
-				win.document.body.innerHTML = '&#x200b;';
+				win.document.body.innerHTML = '&#8203;';
 			}
 			range.selectNode(win.document.body.firstChild);
 			range.collapse(true);
@@ -340,7 +340,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      * <ol>
      * 	<li>
      * 		当range闭合时，光标正好也是要添加的节点时，只会直接应用样式。
-     * 		否则会创建要添加的节点，而后插入一个0宽度的空格字符(&amp;#x200b;)，这样可以后输入内容时，样式生效。
+     * 		否则会创建要添加的节点，而后插入一个0宽度的空格字符(&amp;#8203;)，这样可以后输入内容时，样式生效。
      *  </li>
      *  <li>
      *  	当range选取了内容后，会在选区的头部和尾部做标记，把range内的块标签拆散*。并使用深度优先算法遍历range内的节点，逐一的遍历，并添加上样式或者节点。
@@ -383,7 +383,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 				elm = domUtil.createDom(styleConf.useTagName, {
 					'ownerDocument': editor.entyDoc
 				});
-				elm.innerHTML = '&#x200b;';
+				elm.innerHTML = '&#8203;';
 				range.insertNode(elm);
 			}
 			

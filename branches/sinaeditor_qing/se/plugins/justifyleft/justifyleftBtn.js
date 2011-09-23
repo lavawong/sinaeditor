@@ -5,12 +5,12 @@ SinaEditor.plugins.add('justifyleftBtn',function(args){
 	
 	var btnConf = {
 		title:'居左',
-		normalClass : 'ico_justifyleft_1'
-		,disabledClass : 'ico_justifyleft_4'
-		,clickedClass : 'ico_justifyleft_3'
-		,mouseoverClass : 'ico_justifyleft_2'
+		normalClass : 'func_left'
+		,disabledClass : 'func_left'
+		,clickedClass : 'func_left_hover'
+		,mouseoverClass : 'func_left_hover'
 		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
+		,group : 'l'
 	};
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);

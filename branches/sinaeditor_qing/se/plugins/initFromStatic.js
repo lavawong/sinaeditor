@@ -76,7 +76,7 @@ SinaEditor.plugins.add('initFromStatic',function(args){
 	            'ownerDocument': editor.entyDoc,
 	            'attributes': {
 					'type':'text/javascript',
-	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+SinaEditor.version
+	                'src':'http://sjs.sinajs.cn/xblog/ierange-m2.js?'+SinaEditor.version
 	            }
 	        });
 			

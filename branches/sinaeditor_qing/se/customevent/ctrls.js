@@ -7,6 +7,9 @@
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.ctrls = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	return [{
 	    'enty' : editor.entyDoc,
 		'events' : {

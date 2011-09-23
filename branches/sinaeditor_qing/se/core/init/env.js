@@ -104,6 +104,7 @@ if(!SinaEditor.env) {
 		var t=window.external;
 		ns.$Maxthon=t.max_version?true:false;
 	}catch(e){}
+	ns.$MOBILE = /Mobile/i.test(_ua);
 	/**
 	 * 当前的域和当前的host是否相同，依此来决定是否需要为iframe设置domain
 	 * @name SinaEditor.env.isCustomDomain

@@ -6,13 +6,13 @@ SinaEditor.plugins.add('linkBtn',function(args){
 	var hidden = linkPanel.nodes.hidden;
 	
 	var btnConf = {
-		title:' 插入链接',
-        normalClass: 'ico_link_1',
-        disabledClass: 'ico_link_4',
-        clickedClass: 'ico_link_3',
-        mouseoverClass: 'ico_link_2',
+		title:'插入链接',
+        normalClass: 'func_addlink',
+        disabledClass: 'func_addlink_dis',
+        clickedClass: 'func_addlink_act',
+        mouseoverClass: 'func_addlink_hover',
         state: SinaEditor.BUTTONSTATE.DISABLED,
-        group: 'richdata'
+        group: 'la'
     };
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
@@ -34,6 +34,19 @@ SinaEditor.plugins.add('linkBtn',function(args){
 					if(SinaEditor.TOOLCONF.addLinkNow && SinaEditor.TOOLCONF.addLinkNow.test(str)) {
 						editor.operation.link({'link':str,'range':range});
 					} else {
+//						var start = range.startContainer;
+//						//要选中A
+//						if(start)
+//						
+//						
+//						linkNode.value = decodeURI(node.href);
+//		_tmpNode = node;
+//		linkPanel.show();
+//						
+//						if() {
+//							editor.panels.link.nodes.linkNode.value = decodeURI(node.href);
+//						}
+						
 						if(range.collapsed) {
 							hidden.style.display = '';
 						}

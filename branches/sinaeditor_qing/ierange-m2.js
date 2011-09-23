@@ -545,6 +545,9 @@ DOMSelection.prototype = {
 			this._ieSelectionBookmark = __refRange._range.getBookmark();
 		} catch(e) {
 			this._ieSelectionElement = __refRange._range.item(0);
+			//为链接临时加上的。。。
+			this._document._linkElm = this._ieSelectionElement;
+			window.parent._linkElm = this._ieSelectionElement;
 		}
 	},
 	

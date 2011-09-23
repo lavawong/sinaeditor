@@ -56,7 +56,7 @@ SinaEditor.plugins.add('showSource', function(args){
             editor.entyBody.innerHTML = '';
         }
         else {
-            editor.entyBody.innerHTML = (editor.entyArea.value).replace(/\u200B|\t|\n|\r/g, '');
+            editor.entyBody.innerHTML = (editor.entyArea.value).replace(/\u8203|\t|\n|\r/g, '');
             filter();
             editor.setState(SinaEditor.STATE.EDITING);
         }
@@ -66,7 +66,7 @@ SinaEditor.plugins.add('showSource', function(args){
         'initialize': function(){
             editor.entyArea.style.display = 'none';
             editor.enty.style.display = '';
-            //editor.focus();
+            editor.focus();
 			if(editor.entyArea.value) {
 				editor.operation.swapData(false);
 			}

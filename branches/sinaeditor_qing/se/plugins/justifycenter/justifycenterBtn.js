@@ -5,12 +5,12 @@ SinaEditor.plugins.add('justifycenterBtn',function(args){
 
 	var btnConf = {
 		title:'居中',
-		normalClass : 'ico_justifycenter_1'
-		,disabledClass : 'ico_justifycenter_4'
-		,clickedClass : 'ico_justifycenter_3'
-		,mouseoverClass : 'ico_justifycenter_2'
+		normalClass : 'func_center'
+		,disabledClass : 'func_center'
+		,clickedClass : 'func_center_hover'
+		,mouseoverClass : 'func_center_hover'
 		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
+		,group : 'c'
 	};
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);

@@ -6,10 +6,10 @@ SinaEditor.plugins.add('boldBtn',function(args){
 	
 	var btnConf = {
 		title:'加粗',
-		normalClass : 'ico_bold_1'
-		,disabledClass : 'ico_bold_4'
-		,clickedClass : 'ico_bold_3'
-		,mouseoverClass : 'ico_bold_2'
+		normalClass : 'func_bold'
+		,disabledClass : 'func_bold'
+		,clickedClass : 'func_bold_hover'
+		,mouseoverClass : 'func_bold_hover'
 		,state : SinaEditor.BUTTONSTATE.DISABLED
 		,group : 'common'
 	};
