@@ -19,11 +19,13 @@
 			<fileset file="${src.dir}/core/abstract/*.js" />
 			<!-- 初始化插件资源 -->
 			<!--<fileset file="${src.dir}/plugins/*.js" />-->
+			
 			<!--
 			<fileset dir="${src.dir}">
 				<include name="plugins/**/*.js" />
 			</fileset>
 			-->
+
 			<fileset file="${src.dir}/plugins/qingAreaEditor/*.js" />
 			<fileset file="${src.dir}/plugins/bold/*.js" />
 			<fileset file="${src.dir}/plugins/qingUpImg/*.js" />
@@ -36,6 +38,7 @@
 			<fileset file="${src.dir}/plugins/redo/*.js" />
 			<fileset file="${src.dir}/plugins/undo/*.js" />
 			<fileset file="${src.dir}/plugins/redoManager/*.js" />
+			<fileset file="${src.dir}/plugins/formatBlock/*.js" />
 			<fileset file="${src.dir}/plugins/addContent.js" />
 			<fileset file="${src.dir}/plugins/initFromStatic.js" />
 			<fileset file="${src.dir}/plugins/submit.js" />

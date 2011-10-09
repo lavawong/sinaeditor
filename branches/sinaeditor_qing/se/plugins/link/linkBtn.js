@@ -20,7 +20,7 @@ SinaEditor.plugins.add('linkBtn',function(args){
 	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
 	
 	editor.btns.link = btn;
-	
+
 	return {
 		"events": [{
             "element": btn.$,
@@ -34,18 +34,22 @@ SinaEditor.plugins.add('linkBtn',function(args){
 					if(SinaEditor.TOOLCONF.addLinkNow && SinaEditor.TOOLCONF.addLinkNow.test(str)) {
 						editor.operation.link({'link':str,'range':range});
 					} else {
-//						var start = range.startContainer;
-//						//要选中A
-//						if(start)
-//						
-//						
-//						linkNode.value = decodeURI(node.href);
-//		_tmpNode = node;
-//		linkPanel.show();
-//						
-//						if() {
-//							editor.panels.link.nodes.linkNode.value = decodeURI(node.href);
-//						}
+						var elm = range.commonAncestorContainer;
+						if (range._range) {
+							elm = range._range.parentElement();
+						}
+						if(elm.nodeType !== SinaEditor.NODETYPE.ELEMENT) {
+							elm = elm.parentNode;
+						}
+						
+						while(elm.tagName.toUpperCase() !== 'BODY') {
+							if(elm.tagName.toUpperCase() === 'A') {
+								editor.panels.link.nodes.link.value = decodeURI(elm.href);
+								range.selectNode(elm);
+								break;
+							}
+							elm = elm.parentNode;
+						}
 						
 						if(range.collapsed) {
 							hidden.style.display = '';

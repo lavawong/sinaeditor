@@ -186,7 +186,8 @@ SinaEditor.RANGE.BLOCKTAGS = {
     "LI": "1",
     "OL": "1",
     "NOBR": "1",
-	"BODY" : "1"
+	"BODY" : "1",
+	"A" : "1"
 };
 
 SinaEditor.RANGE.STYLEOBJECTELEMENTS = {

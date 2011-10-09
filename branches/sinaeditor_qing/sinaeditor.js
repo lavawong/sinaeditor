@@ -4,7 +4,7 @@ if (!window.SinaEditor) {
     SinaEditor = {};
 }
 
-SinaEditor.version = 1.0;
+SinaEditor.version = 2.0;
 
 if (!SinaEditor.CONF) {
     SinaEditor.CONF = {};
@@ -348,12 +348,14 @@ SinaEditor.TOOLCONF.FONTSIZECONF = [{
 }];
 
 //链接的弹出浮层
-SinaEditor.TOOLCONF.linkTemplate = ['<div class="linkItemContent">',
+SinaEditor.TOOLCONF.qingLinkTemplate = ['<div><span>链接地址：</span><input type="text" id="#{link}" /></div>',
+										'<div id="#{hidden}" style="display:none"><span>文字：</span><input id="#{text}" type="text" /></div>'].join('');
+['<div class="linkItemContent">',
 	'<div class="row1" id="#{hidden}" style="display:none">文字:',
 		'<input class="fm1" id="#{text}">',
 	'</div>',
 	'<div class="row2">链接:',
-		'<input value="http://" class="fm1" id="#{link}">',
+		'<input value="" class="fm1" id="#{link}">',
 	'</div>',
 	'<div class="row3">',
 		'<a onclick="return false" id="#{ok}" href="#" class="SG_aBtn SG_aBtnB"><cite>确定</cite></a>',
@@ -587,6 +589,7 @@ if(!SinaEditor.env) {
 		var t=window.external;
 		ns.$Maxthon=t.max_version?true:false;
 	}catch(e){}
+	ns.$MOBILE = /Mobile/i.test(_ua);
 	/**
 	 * 当前的域和当前的host是否相同，依此来决定是否需要为iframe设置domain
 	 * @name SinaEditor.env.isCustomDomain
@@ -595,7 +598,7 @@ if(!SinaEditor.env) {
 		var domain = document.domain,
 			hostname = window.location.hostname;
 
-		return this.ie &&
+		return this.$IE &&
 			domain !== hostname &&
 			domain !== ( '[' + hostname + ']' );
 	}());
@@ -2382,7 +2385,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 		if(!count) {
 			var range = win.document.createRange();
 			if(!win.document.body.firstChild) {
-				win.document.body.innerHTML = '&#x200b;';
+				win.document.body.innerHTML = '&#8203;';
 			}
 			range.selectNode(win.document.body.firstChild);
 			range.collapse(true);
@@ -2684,7 +2687,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      * <ol>
      * 	<li>
      * 		当range闭合时，光标正好也是要添加的节点时，只会直接应用样式。
-     * 		否则会创建要添加的节点，而后插入一个0宽度的空格字符(&amp;#x200b;)，这样可以后输入内容时，样式生效。
+     * 		否则会创建要添加的节点，而后插入一个0宽度的空格字符(&amp;#8203;)，这样可以后输入内容时，样式生效。
      *  </li>
      *  <li>
      *  	当range选取了内容后，会在选区的头部和尾部做标记，把range内的块标签拆散*。并使用深度优先算法遍历range内的节点，逐一的遍历，并添加上样式或者节点。
@@ -2727,7 +2730,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 				elm = domUtil.createDom(styleConf.useTagName, {
 					'ownerDocument': editor.entyDoc
 				});
-				elm.innerHTML = '&#x200b;';
+				elm.innerHTML = '&#8203;';
 				range.insertNode(elm);
 			}
 			
@@ -3395,6 +3398,9 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.ctrlb = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	return [{
 	    'enty' : editor.entyDoc,
 		'events' : {
@@ -3415,6 +3421,9 @@ SinaEditor.ev.customEvent.ctrlb = function(editor) {
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.ctrli = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	return [{
 	    'enty' : editor.entyDoc,
 		'events' : {
@@ -3435,6 +3444,9 @@ SinaEditor.ev.customEvent.ctrli = function(editor) {
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.ctrls = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	return [{
 	    'enty' : editor.entyDoc,
 		'events' : {
@@ -3455,6 +3467,9 @@ SinaEditor.ev.customEvent.ctrls = function(editor) {
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.ctrly = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	return [{
 	    'enty' : editor.entyDoc,
 		'events' : {
@@ -3475,6 +3490,9 @@ SinaEditor.ev.customEvent.ctrly = function(editor) {
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.ctrlz = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	return [{
 	    'enty' : editor.entyDoc,
 		'events' : {
@@ -3494,6 +3512,9 @@ SinaEditor.ev.customEvent.ctrlz = function(editor) {
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.editorHasSelection = function(editor) {
+	if(!editor.entyDoc) {
+		return;
+	}
 	function doo() {
 		editor.entyWin.clearTimeout(editor._.editorHasSelectionBufferTimmer);
         editor._.editorHasSelectionBufferTimmer = editor.entyWin.setTimeout(function(){
@@ -3535,8 +3556,14 @@ SinaEditor.ev.customEvent.editorOnladed = function(editor) {};
  * @param {Object} editor 当前监听的编辑器的对象引用。
  */
 SinaEditor.ev.customEvent.editorSelectionChange = function(editor){
+	if(!editor.entyDoc) {
+		return;
+	}
 	var _listener = function(e){
-		SinaEditor.ev.stopEvent(e);
+		if(SinaEditor.env.$IE) {
+			//在选区内点击，不能折叠...
+			SinaEditor.ev.stopEvent(e);
+		}
 	    editor.entyWin.clearTimeout(editor._.editorHasSelectionBufferTimmer);
 	    editor._.editorHasSelectionBufferTimmer = editor.entyWin.setTimeout(function(){
             //虽然可以多选，但是只检测第一个
@@ -3559,7 +3586,7 @@ SinaEditor.ev.customEvent.editorSelectionChange = function(editor){
             }
             editor._.oldRange = ranges;
         }, 400);
-		return false;
+		//return false;
     };
     
     var _handleEvent = function(e, range){
@@ -4409,22 +4436,6 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 	//已有插件列表
 	this._jobTableIndex = {};
 	/**
-	 * 实体对象，即编辑器的iframe节点。
-	 */
-	this.enty = null;
-	/**
-	 * iframe的window对象引用。
-	 */
-	this.entyWin = null;
-	/**
-	 * iframe的document对象引用。
-	 */
-	this.entyDoc = null;
-	/**
-	 * iframe的body节点引用。
-	 */
-	this.entyBody = null;
-	/**
 	 * 编辑器的textarea节点引用。
 	 */
 	this.entyArea = null;
@@ -4504,35 +4515,45 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 			i++;
             if (i >= joblen) {
                 clearInterval(interNum);
-                interNum = null;
+				interNum = null;
+				if(joblen === 0) {
+					_this._initCustomEvent();
+					_this.setState(SinaEditor.STATE.CREATED);
+					_this.setState(SinaEditor.STATE.EDITING);
+				}
                 SinaEditor.ev.fire(_this, 'editorOnladed');
                 return;
             }
 			if(_this.entyWin) {
-				
-				if(!_this.hasAddEvent) {
-					_this.hasAddEvent = true;
-					var ev = null;
-					//这里来初始化事件
-					for(ev in SinaEditor.ev.customEvent) {
-						if(_this.option.eventBlackList.indexOf(ev) < 0) {
-							SinaEditor.ev.$regEvent(ev,_this);
-						} else {
-							console.log(_this.option.id+'在黑名单中：'+ev);
-						}
-					}
-				}
+				_this._initCustomEvent();
 				
 				_this.callPlugin(jobs[i]);
 				
 				_this.setState(SinaEditor.STATE.CREATED);
 				_this.setState(SinaEditor.STATE.EDITING);
+				
 			} else {
 				console.log("等一下");
 				i--;
 			}
         }, 10);
-    },
+    }
+	
+	,_initCustomEvent : function(){
+		if(!this.hasAddEvent) {
+			this.hasAddEvent = true;
+			var ev = null;
+			//这里来初始化事件
+			for(ev in SinaEditor.ev.customEvent) {
+				if(this.option.eventBlackList.indexOf(ev) < 0) {
+					SinaEditor.ev.$regEvent(ev,this);
+				} else {
+					console.log(this.option.id+'在黑名单中：'+ev);
+				}
+			}
+		}
+	}
+	
     /**
      * 单独后执行某个插件。
      * @memberOf SinaEditor.$abstract.baseEditor#
@@ -4555,7 +4576,11 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 	 * 	</tr>
      * </table>
      */
-    callPlugin: function(pluginConf){
+    ,callPlugin: function(pluginConf){
+		if(!pluginConf) {
+			return;
+		}
+		console.log("callPlugin:"+pluginConf.name);
 		var getTime = function(){
             return new Date().valueOf();
         };
@@ -4619,13 +4644,6 @@ SinaEditor.$abstract.baseEditor = function(oOption){
         }
     }
 	/**
-     * 焦点集中到编辑器中。
-     * @memberOf SinaEditor.$abstract.baseEditor#
-     */
-	,focus : function() {
-		this.entyWin.focus();
-	}
-	/**
      * 设置编辑器的状态。设置后，会触发自定义事件editorStateChange。
      * @memberOf SinaEditor.$abstract.baseEditor#
      * @param state {int} 要设置的编辑器的状态可以设置：<br>
@@ -4660,8 +4678,10 @@ SinaEditor.createEditor = function(conf){
     //    job.add(conf['filter']);
     //}
 	var job = new (eval('(' + conf.editorName + ')'))(conf);
-	var pName = conf.plugns,i;
-	job.add(conf.initType);
+	var pName = conf.plugns || [],i;
+	if(conf.initType) {
+		job.add(conf.initType);
+	}
 	if (conf.filter) {
         job.add(conf.filter);
     }
@@ -4857,7 +4877,7 @@ SinaEditor.$abstract.ButtonFactory = function(){
 				var group,gid,i,j;
 				for(i=0; groups[i]; i++) {
 					group = groups[i];
-					var gSpan = SinaEditor.util.dom.createDom('div',{'properties':{'className':'se_ico_group','id':groupid}});
+					var gSpan = SinaEditor.util.dom.createDom('li',{'properties':{'id':groupid}});
 					for(id in group) {
 						for(j=0; group[id][j]; j++) {
 							gSpan.appendChild(group[id][j].$);
@@ -4867,7 +4887,7 @@ SinaEditor.$abstract.ButtonFactory = function(){
 				}
 			},{once:true});
 		} else {
-			var group = document.getElementById(groupid) || SinaEditor.util.dom.createDom('div',{'properties':{'className':'se_ico_group','id':groupid}});
+			var group = document.getElementById(groupid) || SinaEditor.util.dom.createDom('li',{'properties':{'id':groupid}});
 			group.appendChild(btn.$);
 			document.getElementById(editor.option.toolBase).appendChild(group);
 		}
@@ -5145,7 +5165,7 @@ SinaEditor.$abstract.redoManager = function(){
 		
 		var curr = element;
 		var parent = element.parentNode;
-		while(parent && parent.nodeType !== SinaEditor.NODETYPE.HTMLELEMENT) {
+		while(parent && parent.tagName.toUpperCase() !== "HTML") {
 			
 			var ch = parent.childNodes;
 			var i;
@@ -5196,234 +5216,10 @@ SinaEditor.$abstract.redoManager = function(){
 });
 SinaEditor.redoManager = new SinaEditor.$abstract.redoManager();
 
-//添加内容
-SinaEditor.plugins.add('addContent',function(args){
+//使用ipad等便携设备访问时使用。
+SinaEditor.plugins.add('qingAreaEditor',function(args){
 	var editor = this;
-	
-	/**
-	 * 添加节点
-	 * @param {Element} node 要添加的节点。
-	 * @param {Booelan} focus 是否把焦点集中到新添的节点中
-	 */
-	editor.operation.addNode = function(node,focus){
-		editor.focus();
-		
-		editor.operation.save(editor);
-		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
-		if(!range.collapsed) {
-			range.deleteContents();
-		}
-		range.insertNode(node);
-		if(!focus) {
-			_focusAfter(node,range);
-		}
-		editor.operation.save(editor);
-	};
-	
-	/**
-	 * 添加文本
-	 * @param {String} str 要添加的字符串
-	 * @param {Booelan} focus 是否把焦点集中到新添的字符串中
-	 */
-	editor.operation.addContent = function(str,focus){
-		editor.focus();
-		
-		editor.operation.save(editor);
-		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
-		if(!range.collapsed) {
-			range.deleteContents();
-		}
-		var textNode = editor.entyDoc.createTextNode(str);
-		range.insertNode(textNode);
-		if(!focus) {
-			_focusAfter(textNode,range);
-		}
-		editor.operation.save(editor);
-	};
-	
-	var _focusAfter = function(node,range) {
-		range.selectNode(node);
-		range.collapse(false);
-		SinaEditor.range.applyRanges(editor.entyWin,range);
-		editor.focus();
-	};
-});
-//背景颜色的获取逻辑
-//在span里加color来实现这一目的
-SinaEditor.plugins.add('backcolor',function(args){
-	var editor = this;
-	editor.btns.backcolor = null;
-	editor.panels.backcolor = null;
-	if(!args.customerPanel) {
-		editor.callPlugin({
-			'name' : 'backcolorPanel',
-			'args' : args
-		});
-	}
-	
-	if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'backcolorBtn',
-			'args' : args
-		});
-	}
-	
-	//注册查询的状态
-	SinaEditor.range.regQueryCommandState('backcolor',function(refNode){
-		return SinaEditor.util.dom.getStyle(refNode, 'backgroundColor');
-	});
-	
-	/**
-	 * 文字颜色修改
-	 * #BLOGBUG-12268 在safari4下,设置背景色，回车，背景色的span标签丢失
-	 * @param {String} color 要修改的文字颜色。
-	 */
-	editor.operation.backcolor = function(color){
-        editor.operation.save(editor);
-		console.log('背景颜色修改');
-		SinaEditor.range.applyStyle(editor, {
-            'useTagName': 'span',
-			'style': 'backgroundColor',
-	        'value': color
-        });
-		editor.btns.backcolor.setState(SinaEditor.BUTTONSTATE.NORMAL,color);
-        editor.operation.save(editor);
-    };
-});
-//背景颜色的按钮
-SinaEditor.plugins.add('backcolorBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'背景颜色',
-		normalClass : 'ico_hilitecolor_1'
-		,disabledClass : 'ico_hilitecolor_4'
-		,clickedClass : 'ico_hilitecolor_3'
-		,mouseoverClass : 'ico_hilitecolor_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'common'
-		,setState : function(state,color){
-			switch(state) {
-				case SinaEditor.BUTTONSTATE.DISABLED : 
-					this.$.style.backgroundColor = '#FFFFFF';
-					break;
-				default :
-					this.$.style.backgroundColor = color;
-			}
-		}
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.backcolor = btn;
-	
-	return {
-		"events": [{
-            "element": btn.$,
-            "events": {
-                'click' : function() {
-					if(editor.btns.backcolor.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.panels.backcolor.show(this);
-					return false;
-				}
-            }
-        },{
-            "element": editor,
-            "events": {
-				'editorSelectionChange' : function(e,range,refNode) {
-					var color = SinaEditor.range.queryCommandState(this.entyDoc,'backColor');
-					if(color === 'transparent') {
-						color = '#FFFFFF';
-					}
-					editor.btns.backcolor.setState(SinaEditor.BUTTONSTATE.NORMAL,color);
-				}
-            }
-        }]
-	};
-});
-//背景颜色的弹出浮层
-SinaEditor.plugins.add('backcolorPanel',function(args){
-	var editor = this;
-	
-	var outerDiv = SinaEditor.util.dom.createDom('div',{
-		properties : {
-			'className' : 'se_forecolor_bubble'
-		}
-	});
-	
-	editor.panels.backcolor = (function(){
-		var colors = args.colors || SinaEditor.TOOLCONF.COLOR;
-		outerDiv.style.display = 'none';
-		
-		document.body.appendChild(outerDiv);
-		
-		var selArr = [];
-		var color;
-		for(color in colors) {
-			selArr.push('<span onmouseover="this.className=\'color_focus\'" onmouseout="this.className=\'\'"><span class="j_single_color" title="');
-			selArr.push(colors[color]);
-			selArr.push('" style="background-color:#');
-			selArr.push(color);
-			selArr.push(';"></span></span>');
-		}
-		
-		outerDiv.innerHTML = selArr.join('');
-		
-		return {
-			show : function(elm) {
-				var loc = SinaEditor.util.dom.getXY(elm);
-				outerDiv.style.display = '';
-				outerDiv.style.top = loc[1]+editor.btns.backcolor.$.offsetHeight+'px';
-				outerDiv.style.left = loc[0]+'px';
-			},
-			hidden : function() {
-				outerDiv.style.display = 'none';
-			}
-		};
-	})();
-	
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-                'editorSelectionChange' : function() {
-					editor.panels.backcolor.hidden();
-				}
-            }
-        },{
-            "element": outerDiv,
-            "events": {
-                'click' : function(e) {
-					SinaEditor.ev.stopEvent(e);
-					editor.focus();
-					var target = e.target;
-					if(target.className === 'j_single_color') {
-						editor.operation.backcolor(SinaEditor.util.dom.getStyle(target, 'backgroundColor'));
-						editor.panels.backcolor.hidden();
-					}
-					return false;
-				}
-            }
-        },{
-            "element": document,
-            "events": {
-                'click' : function(e) {
-					var target = e.target;
-					if(SinaEditor.util.dom.containsNode(editor.btns.backcolor.$,target)) {
-						return false;
-					}
-					if(!SinaEditor.util.dom.containsNode(outerDiv,target)) {
-						editor.panels.backcolor.hidden();
-					}
-					return false;
-				}
-            }
-        }]
-    };
+	editor.entyArea = args.entyArea;
 });
 //用于加粗
 //通过添加strong标签和移除strong标签来达到
@@ -5458,7 +5254,8 @@ SinaEditor.plugins.add('bold',function(args){
 		if(isBold) {
 			console.log('执行去加粗操作');
 			SinaEditor.range.removeStyle(editor, {
-	            'useTagName': ['strong','b']
+	            'useTagName': ['strong','b','span'],
+				'style' : 'fontWeight'
 	        });
 			btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
 		} else {
@@ -5505,10 +5302,10 @@ SinaEditor.plugins.add('boldBtn',function(args){
 	
 	var btnConf = {
 		title:'加粗',
-		normalClass : 'ico_bold_1'
-		,disabledClass : 'ico_bold_4'
-		,clickedClass : 'ico_bold_3'
-		,mouseoverClass : 'ico_bold_2'
+		normalClass : 'func_bold'
+		,disabledClass : 'func_bold'
+		,clickedClass : 'func_bold_hover'
+		,mouseoverClass : 'func_bold_hover'
 		,state : SinaEditor.BUTTONSTATE.DISABLED
 		,group : 'common'
 	};
@@ -5532,908 +5329,120 @@ SinaEditor.plugins.add('boldBtn',function(args){
 		}]
     };
 });
-//插入表情
-SinaEditor.plugins.add('faceUI',function(args){
-	var editor = this;
-	
-	if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'faceUIBtn',
-			'args' : args
-		});
-	}
-	
-	if (!args.customerPanel) {
-		editor.callPlugin({
-			'name': 'faceUIPanel',
-			'args': args
-		});
-	}
-	
-	/**
-	 * 添加表情
-	 * @param {String} src 要添加表情的src
-	 */
-	editor.operation.addFace = function(src){
-		if(!src) {
+//上传图片
+SinaEditor.plugins.add('imgFlashUI',function(args){
+    var editor = this;
+	//传递的类来自：
+	//$import("comps/publish/upimgflash.js");
+	var upImgObj = args.upImgObj;
+	editor.callPlugin({
+		'name' : 'imgFlashUIBtn',
+		'args' : args
+	});
+
+	editor.operation.resetUpImg = function(){
+		var __this = this;
+		var upImgBtn = editor.btns.imgFlashUI.$;
+		upImgObj.setBtn(upImgBtn.parentNode, onFileSelect, onFileComplete, onAllComplete, onError, 20);
+		function onFileSelect(){
+			//trace("onFileSelect");
+			dis_form();
+		}
+		
+		function onFileComplete(fileName, picInfo){
+			//trace("onFileComplete");
+			var __info = Core.String.j2o(picInfo);
+			var frage = editor.entyDoc.createDocumentFragment();
+			var img = editor.entyDoc.createElement('img');
+			img.src = __info.original_pic.replace("/large/", "/mw600/");
+			img.className = 'long_pic';
+			img.onload = function(){
+				if(img.width>500) {
+					img.width = 500;
+				}
+			};
+			editor.operation.addNode(img);
 			return;
 		}
-		
-		editor.operation.save(editor);
-		
-		var img = SinaEditor.util.dom.createDom('img',{
-			ownerDocument : editor.entyDoc,
-			attributes : {
-				'_se_type' : 'face'
-			},
-			properties : {
-				'src' : src
-			}
-		});
-		
-		editor.operation.addNode(img);
-		
-		editor.operation.save(editor);
-	};
-
-});
-//插入表情
-SinaEditor.plugins.add('faceUIBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'表情'
-		,normalClass : 'ico_face_1'
-		,disabledClass : 'ico_face_4'
-		,clickedClass : 'ico_face_3'
-		,mouseoverClass : 'ico_face_2'
-		,state : SinaEditor.BUTTONSTATE.NORMAL
-		,group : 'richdata'
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.faceUI = btn;
-	
-    return {
-        "events": [{
-            "element": btn.$,
-            "events": {
-				'click' : function(){
-					var facePanel = editor.panels.faceUI;
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					var pos = SinaEditor.util.dom.getXY(btn.$);
-					facePanel.setPosition({x:pos[0],y:(pos[1]+btn.$.offsetHeight)});
-					facePanel.show();
-				}
-            }
-        }]
-    };
-});
-//插入表情
-SinaEditor.plugins.add('faceUIPanel',function(args){
-	var editor = this;
-
-	var facePanel = new SinaEditor._.Panel();
-	facePanel.setTemplate(SinaEditor.TOOLCONF.faceTemplate);
-	
-	var panel = facePanel.nodes.panel;
-	var faceArr = args.faceSrc || SinaEditor.TOOLCONF.faceSrc;
-	
-	var htmls = [];
-	var i,key;
-	for(i=0; faceArr[i]; i++) {
-		htmls.push('<img ');
-		for(key in faceArr[i]) {
-			htmls.push(key);
-			htmls.push('="');
-			htmls.push(faceArr[i][key]);
-			htmls.push('"');
+		function onAllComplete(){
+			//trace("onAllComplete");
+			//window.editor.insertHTML("<br />");
+			nor_form();
 		}
-		htmls.push('" onmouseout="this.className=\'\'" onmouseover="this.className=\'face_focus\'" ');
-		htmls.push('/>');
-	}
-	panel.innerHTML = htmls.join('');
-	
-	editor.panels.faceUI = facePanel;
-	
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-				'editorSelectionChange' : function(){
-					facePanel.hidden();
-				}
-            }
-        },{
-            "element": panel,
-            "events": {
-				'click' : function(e){
-					var target = e.target;
-					if(target.tagName.toUpperCase() == 'IMG') {
-						editor.operation.addFace(target.src);
-						facePanel.hidden();
-					}
-				}
-            }
-        },{
-            "element": document,
-            "events": {
-				'click' : function(e){
-					var target = e.target;
-					if(SinaEditor.util.dom.containsNode(editor.btns.faceUI.$,target)) {
-						return;
-					}
-					if(!SinaEditor.util.dom.containsNode(panel,target)) {
-						facePanel.hidden();
-					}
-				}
-            }
-        }]
-    };
-});//当鼠标链接在IMG标签内时
-SinaEditor.plugins.add('flashBubble', function(){
-    return SinaEditor.$abstract.BaseBubblePlugin({
-        tagName: 'FLASH',
-        applyStyles: SinaEditor.CONF.aBubbleStyles,
-        showBubble: function(node, editor){
-        
-            var t = new Date().getTime();
-            var html, data;
-            var seid = 'f_se_b_' + t;
-            var did = 'f_d_b_' + t;
-            var sid = 'f_s_b_' + t;
-            var cid = 'f_c_b_' + t;
-            data = {
-                seeid: seid,
-                deleteid: did,
-                showflash: sid,
-                closeid: cid
-            };
-            var href = node.href;
-            html = new SinaEditor.$abstract.Template(SinaEditor.CONF.flashBubbleTemplete);
-            
-            var pos = SinaEditor.util.dom.getXY(node,true);
-            var iframePos = SinaEditor.util.dom.getXY(editor.enty);
-            if (iframePos[1] > pos[1]) {
-                pos[1] = iframePos[1];
-            }
-            var bubble = SinaEditor.baseBubble.showBubble(html.evaluate(data), {
-                x: pos[0],
-                y: pos[1]
-            });
-            bubble.id(seid).onclick = function(){
-                var snode = bubble.id(sid);
-                bubble.id(seid).style.display = 'none';
-                snode.innerHTML = decodeURIComponent(node.getAttribute('_se_flash'));
-                //chrome下看不到部分flash
-                if (SinaEditor.env.$CHROME) {
-                    var embed = snode.getElementsByTagName('embed')[0];
-                    embed.setAttribute('wmode', 'transparent');
-                    snode.innerHTML = SinaEditor.util.dom.outerHTML(embed);
-                    
-                }
-                snode.style.display = '';
-            };
-            bubble.id(cid).onclick = function(){
-                SinaEditor.baseBubble.hiddenBubble();
-                editor.focus();
-            };
-            bubble.id(did).onclick = function(){
-                editor.operation.save(editor);
-				
-                var children = node;
-				editor.focus();
-				SinaEditor.range.setStartBefore(editor.entyWin, node);
-                node.parentNode.removeChild(node);
-                SinaEditor.baseBubble.hiddenBubble();
-                
-                editor.operation.save(editor);
-            };
-        }
-    });
-}());
-
-//插入flash
-SinaEditor.plugins.add('flashUI', function(args){
-    var editor = this;
-    
-    if (!args.customerBtn) {
-        editor.callPlugin({
-            'name': 'flashUIBtn',
-            'args': args
-        });
-    }
-    
-    if (!args.customerPanel) {
-        editor.callPlugin({
-            'name': 'flashUIPanel',
-            'args': args
-        });
-    }
-    
-    /**
-     * 插入flash
-     * @param {String | Element} node 当前的节点html字符串，或者是节点。
-     * @param {Boolean} focus 是否选中添加的flash
-     */
-    editor.operation.insertFlash = function(node, focus){
-        if (typeof node === 'string') {
-            node = SinaEditor.util.dom.createDomFromHTML(node, editor.entyDoc);
-        }
-        var img = SinaEditor.util.dom.createDomFromHTML('<img src="' + SinaEditor.CONF.transparentIMG + '" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(node)) + '" width="' + (node.width || 480) + '" height="' + (node.height || 370) + '" style="background:url(\'' + SinaEditor.CONF.fakeFLASH + '\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
-        editor.operation.addNode(img, focus);
-    };
-});
-
-//插入flash
-SinaEditor.plugins.add('flashUIBtn',function(args){
-    var editor = this;
-	
-	var btnConf = {
-		title:'插入flash',
-        normalClass: 'ico_video_1',
-        disabledClass: 'ico_video_4',
-        clickedClass: 'ico_video_3',
-        mouseoverClass: 'ico_video_2',
-        state: SinaEditor.BUTTONSTATE.DISABLED,
-        group: 'richdata'
-    };
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.flashUI = btn;
-    
-    return {
-        "events": [{
-            "element": btn.$,
-            "events": {
-				'click' : function() {
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.panels.flashUI.show();
-					return false;
-				}
-            }
-        }]
-    };
-});
-
-//插入flash
-SinaEditor.plugins.add('flashUIPanel',function(args){
-    var editor = this;
-    
-    var flashPanel = SinaEditor.winDialog.create({
-        title: '添加flash',
-        content: SinaEditor.TOOLCONF.flashTemplate,
-        funcClose: function(){
-			_back();
-        }
-    });
-	
-	var flashSrc = flashPanel.nodes.flashSrc;
-	var ok = flashPanel.nodes.ok;
-	var cancel = flashPanel.nodes.cancel;
-	var flashErrTip = flashPanel.nodes.flashErrTip;
-	
-	var _back = function(){
-		flashSrc.value = '';
-		flashErrTip.style.display = 'none';
+		function onError(){
+			//trace("onError");
+			nor_form();
+		}
+		// 切换按钮状态
+		function nor_form(){
+			//trace("nor_form");
+			upImgBtn.className = "func_insertpic";
+			upImgBtn._disabled = false;
+			editor.operation.resetUpImg();
+			//先focus标题输入框，解决中文输入时上传图片后不能输入中文的bug
+			//__this.nodes.inputTitle.focus();
+			
+			editor.blur();
+			editor.focus();
+			//trace("after focus127");
+		}
+		function dis_form(){
+			//trace("dis_form");
+			upImgBtn.className = "func_loading";
+			upImgBtn._disabled = true;
+			upImgObj.minize();
+		}
 	};
 	
-	editor.panels.flashUI = flashPanel;
-    
-    return {
-        "events": [{
-            "element": cancel,
-            "events": {
-				'click' : function() {
-					_back();
-					flashPanel.hidden();
-				}
-            }
-        },{
-            "element": ok,
-            "events": {
-				'click' : function() {
-					flashErrTip.style.display = 'none';
-					var src = SinaEditor.util.trim(flashSrc.value);
-					if(!src) {
-						//_back();
-						flashErrTip.style.display = '';
-						//flashPanel.hidden();
-						return;
-					}
-					editor.operation.insertFlash(src);
-					_back();
-					flashPanel.hidden();
-				}
-            }
-        }]
-    };
+	editor.operation.resetUpImg();
 });
 
-//字体的大小
-SinaEditor.plugins.add('fontSize',function(args){
-	var editor = this;
-
-	//注册查询的状态
-	SinaEditor.range.regQueryCommandState('fontsize',function(refNode){
-		return SinaEditor.util.dom.getStyle(refNode, 'fontSize');
-	});
-    
-    if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'fontSizeBtn',
-			'args' : args
-		});
-    }
-	
-	if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'fontSizePanel',
-			'args' : args
-		});
-    }
-    var btn = editor.btns.fontSize;
-	
-	/**
-	 * 设置字体大小
-	 * @param {String} fontSize 要设置的字体大小
-	 */
-    editor.operation.setFontSize = function(fontSize){
-		editor.focus();
-		
-        editor.operation.save(editor);
-        
-        //添加
-        SinaEditor.range.applyStyle(editor, {
-            'useTagName': 'span',
-            'style': 'fontSize',
-            'value': fontSize
-        });
-        
-        editor.operation.save(editor);
-    };
-});
-
-//字体的大小
-SinaEditor.plugins.add('fontSizeBtn',function(args){
-	var editor = this;
+//上传图片
+SinaEditor.plugins.add('imgFlashUIBtn',function(args){
+    var editor = this;
 
 	var btnConf = {
-		title:'文字大小',
-        normalClass: 'ico_fontsize_1',
-        properties: {
-            'innerHTML': '<span>' + SinaEditor.TOOLCONF.FONTSIZEDEF + '</span>'
-        },
-        disabledClass: 'ico_fontsize_4',
-        clickedClass: 'ico_fontsize_3',
-        mouseoverClass: 'ico_fontsize_2',
+		title:'插入图片',
+        normalClass: 'func_insertpic',
+        disabledClass: 'func_insertpic',
+        clickedClass: 'func_insertpic',
         state: SinaEditor.BUTTONSTATE.NORMAL,
-        group: 'common'
+        group: 'imgFlashUIBtn'
     };
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
 	
 	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
 	
-	editor.btns.fontSize = btn;
-});
-
-//字体的大小
-SinaEditor.plugins.add('fontSizePanel',function(args){
-	var editor = this;
-    var btn = editor.btns.fontSize;
-
-    var _fontSizeConf = args.conf || SinaEditor.TOOLCONF.FONTSIZECONF;
-	
-	var _createDomHTML = function(eid){
-        var sizes = _fontSizeConf;
-        var str = ['<div class="fontItemTitle">字号</div>'];
-        var size, style,i;
-        for (i = 0; sizes[i]; i++) {
-            size = sizes[i].html;
-            style = sizes[i].style || size;
-            str.push('<div class="fontItem" style="font-size:');
-            str.push(style);
-            str.push('">');
-            str.push(size);
-            str.push('</div>');
-        }
-        return str.join('');
-    };
-    
-    var _bindEvent = function(children){
-		var i,cn;
-        for (i = 0; children[i]; i++) {
-            cn = children[i].className;
-            if (cn && cn == 'fontItem') {
-                children[i].onclick = function(e){
-                    e = e || window.event;
-                    var target = SinaEditor.ev.fixEvent(e).target;
-                    var family = target.style.fontSize;
-                    btn.$.innerHTML = '<span>' + target.innerHTML + '</span>';
-                    editor.operation.setFontSize(family);
-                    SinaEditor.btnBubble.hiddenBubble();
-                    return false;
-                };
-            }
-        }
-    };
-    
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-                'editorSelectionChange': function(){
-                    SinaEditor.btnBubble.hiddenBubble();
-                }
-				,'editorSelectionChange': function(e, range, refNode){
-                    var style = SinaEditor.range.queryCommandState(this.entyDoc,'fontsize');
-                    var family = _fontSizeConf;
-                    console.log(style);
-                    var html = '<span>' + SinaEditor.TOOLCONF.FONTSIZEDEF + '</span>';
-                    var tmp,i;
-                    for (i = 0; family[i]; i++) {
-                        //tmp = family[i]['style'] || family[i]['html'];
-						tmp = family[i].style || family[i].html;
-                        if (style.indexOf(tmp) != -1) {
-                            //html = '<span>' + family[i]['html'] + '</span>';
-							html = '<span>' + family[i].html + '</span>';
-                            break;
-                        }
-                        
-                    }
-                    btn.$.innerHTML = html;
-                }
-            }
-        },{
-            'element': btn.$,
-            'events': {
-                'click': function(){
-                    if (editor.getState() != SinaEditor.STATE.EDITING) {
-                        return;
-                    }
-                    var loc = SinaEditor.util.dom.getXY(btn.$);
-                    var div = SinaEditor.util.dom.createDom('div');
-                    div.innerHTML = _createDomHTML(editor.option.id);
-                    _bindEvent(div.childNodes);
-                    SinaEditor.btnBubble.showBubble(div, {
-                        x: loc[0],
-                        y: loc[1] + btn.$.offsetHeight + SinaEditor.util.dom.styleInteger(btn.$, 'paddingTop') + SinaEditor.util.dom.styleInteger(btn.$, 'marginTop'),
-                        'className': 'se_fontfamily_bubble'
-                    });
-                    return false;
-                }
-            }
-        }]
-    };
-});
-
-//字体选择
-SinaEditor.plugins.add('fontFamily',function(args){
-	var editor = this;
-    var btn = null;
-    if (!SinaEditor._fontConf) {
-        SinaEditor._fontConf = {};
-    }
-    
-    if (!args.customerBtn) {
-        editor.callPlugin({
-			'name' : 'fontFamilyBtn',
-			'args' : args
-		});
-    }
-	
-	if (!args.customerPanel) {
-        editor.callPlugin({
-			'name' : 'fontFamilyPanel',
-			'args' : args
-		});
-    }
-    
-	/**
-	 * 设置字体
-	 * @param {String} fontFamily 要设置的字体值
-	 */
-    editor.operation.setFontFamily = function(fontFamily){
-        editor.operation.save(editor);
-        
-        //添加
-        SinaEditor.range.applyStyle(editor, {
-            'useTagName': 'span',
-            'style': 'fontFamily',
-            'value': fontFamily
-        });
-        
-        editor.operation.save(editor);
-    };
-});
-
-//字体选择
-SinaEditor.plugins.add('fontFamilyBtn',function(args){
-	var editor = this;
-	
-	var _fontConf = args.conf || SinaEditor.TOOLCONF.FONTFAMILYCONF;
-
-	var btnConf = {
-		title:'字体',
-        normalClass: 'ico_family_1',
-        properties: {
-            'innerHTML': '<span>' + SinaEditor.TOOLCONF.FONTFAMILYDEF + '</span>'
-        },
-        disabledClass: 'ico_family_4',
-        clickedClass: 'ico_family_3',
-        mouseoverClass: 'ico_family_2',
-        state: SinaEditor.BUTTONSTATE.NORMAL,
-        group: 'common'
-    };
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.fontFamily = btn;
-	
-	
-	var _createDomHTML = function(eid){
-        var str = ['<div class="fontItemTitle">字体</div>'];
-        var family, style,i;
-        for (i = 0; _fontConf[i]; i++) {
-            family = _fontConf[i].html;
-            style = _fontConf[i].style || family;
-            str.push('<div class="fontItem" style="font-family:');
-            str.push(style);
-            str.push('">');
-            str.push(family);
-            str.push('</div>');
-        }
-        return str.join('');
-    };
-	
-	var _bindEvent = function(children){
-		var i;
-        for (i = 0; children[i]; i++) {
-            var cn = children[i].className;
-            if (cn && cn == 'fontItem') {
-                children[i].onclick = function(e){
-					editor.focus();
-                    e = e || window.event;
-                    var target = SinaEditor.ev.fixEvent(e).target;
-                    var family = target.style.fontFamily;
-                    btn.$.innerHTML = '<span style="font-family:' + family + '">' + target.innerHTML + '</span>';
-                    editor.operation.setFontFamily(family);
-                    SinaEditor.btnBubble.hiddenBubble();
-                    return false;
-                };
-            }
-        }
-    };
-	
-	return {
-		'events' : [{
-            'element': btn.$,
-            'events': {
-                'click': function(){
-                    if (editor.getState() != SinaEditor.STATE.EDITING) {
-                        return;
-                    }
-                    var loc = SinaEditor.util.dom.getXY(btn.$);
-                    var div = SinaEditor.util.dom.createDom('div');
-                    div.innerHTML = _createDomHTML(editor.option.id);
-                    _bindEvent(div.childNodes);
-                    SinaEditor.btnBubble.showBubble(div, {
-                        x: loc[0],
-                        y: loc[1] + btn.$.offsetHeight + SinaEditor.util.dom.styleInteger(btn.$, 'paddingTop') + SinaEditor.util.dom.styleInteger(btn.$, 'marginTop'),
-                        'className': 'se_fontfamily_bubble'
-                    });
-                    return false;
-                }
-            }
-        }, {
-            'element': editor,
-            'events': {
-                'editorSelectionChange': function(e,range,refNode){
-                    var style = SinaEditor.util.dom.getStyle(refNode, 'fontFamily');
-                    var family = _fontConf;
-                    var html = '<span>' + SinaEditor.TOOLCONF.FONTFAMILYDEF + '</span>';
-                    var tmp,i;
-                    for (i = 0; family[i]; i++) {
-                        //tmp = family[i]['style'] || family[i]['html'];
-						tmp = family[i].style || family[i].html;
-                        if (style.indexOf(tmp) != -1) {
-                            //html = '<span style="font-family:' + tmp + '">' + family[i]['html'] + '</span>';
-							html = '<span style="font-family:' + tmp + '">' + family[i].html + '</span>';
-                            break;
-                        }
-                        
-                    }
-                    btn.$.innerHTML = html;
-                }
-            }
-        }]
-	};
-});
-//字体选择
-SinaEditor.plugins.add('fontFamilyPanel',function(args){
-	var editor = this;
-    var btn = editor.btns.fontFamily;
-	var _fontConf = args.fontConf || SinaEditor.TOOLCONF.FONTFAMILYCONF;
-    
-    var _bindEvent = function(children){
-		var i;
-        for (i = 0; children[i]; i++) {
-            var cn = children[i].className;
-            if (cn && cn == 'fontItem') {
-                children[i].onclick = function(e){
-                    e = e || window.event;
-                    var target = SinaEditor.ev.fixEvent(e).target;
-                    var family = target.style.fontFamily;
-                    btn.$.innerHTML = '<span style="font-family:' + family + '">' + target.innerHTML + '</span>';
-                    editor.operation.setFontFamily(family);
-                    SinaEditor.btnBubble.hiddenBubble();
-                    return false;
-                };
-            }
-        }
-    };
-    
+	editor.btns.imgFlashUI = btn;
+    /*
     return {
 		'events' : [{
-            "element": editor,
+			"element": btn.$,
             "events": {
-                'editorSelectionChange': function(){
-                    SinaEditor.btnBubble.hiddenBubble();
-                }
-            }
-        }]
-	}
-});
-
-//文字颜色的获取
-//在span里加color来实现这一目的
-SinaEditor.plugins.add('forecolor',function(args){
-	var editor = this;
-	
-	if (!args.customerPanel) {
-       editor.callPlugin({
-			'name' : 'forecolorPanel',
-			'args' : args
-		});
-    }
-	
-	if (!args.customerBtn) {
-       editor.callPlugin({
-			'name' : 'forecolorBtn',
-			'args' : args
-		});
-    }
-	
-	var btn = editor.btns.forecolor;
-	var panel = editor.panels.forecolor;
-	
-	//注册查询的状态
-	SinaEditor.range.regQueryCommandState('forecolor',function(refNode){
-		console.log(SinaEditor.util.dom.getStyle(refNode, 'color') || '#CCC');
-		return SinaEditor.util.dom.getStyle(refNode, 'color');
-	});
-	
-	/**
-	 * 文字颜色修改
-	 * @param {String} color 要修改的文字颜色。
-	 */
-	editor.operation.forecolor = function(color){
-		editor.focus();
-
-        editor.operation.save(editor);
-		
-		console.log('文字颜色修改');
-		SinaEditor.range.applyStyle(editor, {
-            'useTagName': 'span',
-			'style': 'color',
-	        'value': color
-        });
-		btn.setState(SinaEditor.BUTTONSTATE.NORMAL,color);
-        
-        editor.operation.save(editor);
-    };
-});
-//文字颜色的获取
-//在span里加color来实现这一目的
-SinaEditor.plugins.add('forecolorBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'文字颜色',
-		normalClass : 'ico_forecolor_1'
-		,disabledClass : 'ico_forecolor_4'
-		,clickedClass : 'ico_forecolor_3'
-		,mouseoverClass : 'ico_forecolor_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'common'
-		,setState : function(state,color){
-			switch(state) {
-				case SinaEditor.BUTTONSTATE.DISABLED :
-					this.$.style.backgroundColor = '#000000';
-					break;
-				default :
-					this.$.style.backgroundColor = color;
-			}
-		}
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.forecolor = btn;
-	
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-                'editorSelectionChange' : function(e,range,refNode) {
-					var color = SinaEditor.range.queryCommandState(this.entyDoc,'forecolor');
-					if(!color) {
-						color = '#000000';
-					}
-					btn.setState(SinaEditor.BUTTONSTATE.NORMAL,color);
-				}
-            }
-        },{
-            "element": btn.$,
-            "events": {
-                'click' : function(e,range,refNode) {
-					if(editor.btns.backcolor.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.panels.forecolor.show(this);
-					return false;
-				}
-            }
-        }]
-    };
-});
-//文字颜色的获取
-//在span里加color来实现这一目的
-SinaEditor.plugins.add('forecolorPanel',function(args){
-	var editor = this;
-	//var colorPanel = editor.panels.forecolor;
-	var outerDiv = SinaEditor.util.dom.createDom('div',{
-		properties : {
-			'className' : 'se_forecolor_bubble'
-		}
-	});
-	var colorPanel = (function(){
-		var colors = args.colors || SinaEditor.TOOLCONF.COLOR;
-		outerDiv.style.display = 'none';
-		
-		document.body.appendChild(outerDiv);
-		
-		var selArr = [];
-		var color;
-		for(color in colors) {
-			selArr.push('<span onmouseover="this.className=\'color_focus\'" onmouseout="this.className=\'\'"><span class="j_single_color" title="');
-			selArr.push(colors[color]);
-			selArr.push('" style="background-color:#');
-			selArr.push(color);
-			selArr.push(';"></span></span>');
-		}
-		
-		outerDiv.innerHTML = selArr.join('');
-		
-		return {
-			show : function(elm) {
-				var loc = SinaEditor.util.dom.getXY(elm);
-				outerDiv.style.display = '';
-				outerDiv.style.top = loc[1]+editor.btns.forecolor.$.offsetHeight+'px';
-				outerDiv.style.left = loc[0]+'px';
-			},
-			hidden : function() {
-				outerDiv.style.display = 'none';
-			}
-		};
-	})();
-
-	editor.panels.forecolor = colorPanel;
-	
-	return {
-		'events' : [{
-			"element": outerDiv,
-            "events": {
-                'click' : function(e) {
-					var target = e.target;
-					if(target.className === 'j_single_color') {
-						editor.operation.forecolor(SinaEditor.util.dom.getStyle(target, 'backgroundColor'));
-						colorPanel.hidden();
-					}
-				}
-            }
-		},{
-			"element": document,
-            "events": {
-                'click' : function(e) {
-					var target = e.target;
-					if(SinaEditor.util.dom.containsNode(editor.btns.forecolor.$,target)) {
-						return;
-					}
-					if(!SinaEditor.util.dom.containsNode(outerDiv,target)) {
-						colorPanel.hidden();
-					}
-				}
-            }
-		},{
-			"element": editor,
-            "events": {
-                'editorSelectionChange' : function(e) {
-					colorPanel.hidden();
+				'click' : function() {
 				}
             }
 		}]
 	};
+	*/
 });
-//历史版本
-SinaEditor.plugins.add('historyUI',function(args){
+
+//轻博客的历史版本
+SinaEditor.plugins.add('qingHistory',function(args){
 	var editor = this;
 	
-	var oldData = '';
-	
-	if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'historyUIBtn',
-			'args' : args
-		});
-	}
-	
-	if (!args.customerPanel) {
-		editor.callPlugin({
-			'name': 'historyUIPanel',
-			'args': args
-		});
-	}
-	
-	var sid = args.id || 0;
+	var uid = args.id || 0;
 	var storage = SinaEditor.$abstract.Storage;
 	
 	/**
-	 * 保存当前的文本内容到本地存储,没10分钟自动保存一次。
-	 * @return  {Boolean} 存储成功或者失败
+	 * 保存文本，根据ID进行绑定。
 	 */
-	editor.operation.saveData = function(){
-//debugger;
-		var newData = editor.entyBody.innerHTML;
-		if(oldData === newData) {
-			return false;
-		}
-		var datas = storage.getItem('SinaEditorData'+sid) || [];
-		var keyTime = +new Date();
-		datas.unshift(keyTime);
-		if(datas.length > SinaEditor.TOOLCONF.historyMax) {
-			var tmpArr = datas.splice(0,SinaEditor.TOOLCONF.historyMax);
-			var i;
-			for(i=0; datas[i]; i++) {
-				storage.removeItem('data_'+sid+'_'+datas[i]);
-			}
-			datas = tmpArr;
-		}
-		if(storage.setItem('data_'+sid+'_'+keyTime,encodeURIComponent(newData)) && storage.setItem('SinaEditorData'+sid,datas)) {
-			oldData = newData;
-			editor.panels.historyUI.updataData();
-			return true;
-		} else {
-			storage.removeItem('data_'+sid+'_'+datas[0]);
-			datas.shift();
-			storage.setItem('SinaEditorData'+sid,datas);
-			return false;
-		}
+	editor.operation.qingSaveData = function() {
+		storage.clear();
+		editor.operation.submit();
+		storage.setItem('qing_data_'+scope.$uid,encodeURIComponent(editor.entyArea.value));
+		console.log("qingSaveData:"+decodeURIComponent(storage.getItem('qing_data_'+scope.$uid)));
 	};
 	
 	/**
@@ -6441,975 +5450,48 @@ SinaEditor.plugins.add('historyUI',function(args){
 	 * @param {Integer} time 获取的对应时间。
 	 * @return {String} 如果没有次参数，返回最新的内容。
 	 */
-	editor.operation.loadData = function(time) {
-		if(!time) {
-			return storage.getItem('SinaEditorData'+sid);
+	editor.operation.qingLoadData = function() {
+		var str = storage.getItem('qing_data_'+scope.$uid);
+		if(str) {
+			editor.entyArea.value = decodeURIComponent(decodeURIComponent(str));
+			try{
+				editor.operation.swapData(false);
+			} catch(e){
+				console.log(e);
+			}
 		}
-		return decodeURIComponent(storage.getItem('data_'+sid+'_'+time));
+		console.log("qingLoadData:"+editor.entyArea.value);
 	};
 	
-	/**
-	 * 把存储的内容放到编辑器内。
-	 * @param {integer} time 要放入的时间，如果没有传递，则放入最新的时间。
-	 */
-	editor.operation.putData = function(time) {
-		var data = this.loadData(time);
-		if(!data) {
-			return;
-		}
-		if(data.join) {
-			data = this.loadData(data[0]);
-		}
-		editor.entyBody.innerHTML = data;
-		editor.operation.clearRU();
+	editor.operation.qingClearAllData = function() {
+		storage.clear();
 	};
 	
-	var save = function(){};
-	var clear = function(){};
-	if(!args.closeAutoSave) {
-		var histroyKey;
-		save = function(){
-			histroyKey = setInterval(function(){
-				editor.operation.saveData();
-			},600000);
-		};
-		clear = function(){
-			clearInterval(histroyKey);
-		};
-	}
-	
-    return {
+	return {
         "events": [{
             "element": editor,
             "events": {
 				'editorStateChange' : function() {
-					switch(this.getState()) {
-						case SinaEditor.STATE.CREATED :
-							editor.panels.historyUI.updataData();
-							editor.operation.putData(0);
-							save();
-							break;
-						case SinaEditor.STATE.EDITING :
-							clearInterval(histroyKey);
-							save();
-							break;
-						case SinaEditor.STATE.SHOWSOURCE :
-							clear();
-							break;
-					}
-				},'ctrls' : function(){
-					editor.operation.saveData();
-				}
-            }
-        }]
-    };
-});
-//历史版本
-SinaEditor.plugins.add('historyUIBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'历史版本',
-		normalClass : 'ico_quicksave_1'
-		,disabledClass : 'ico_quicksave_4'
-		,clickedClass : 'ico_quicksave_3'
-		,mouseoverClass : 'ico_quicksave_2'
-		,state : SinaEditor.BUTTONSTATE.NORMAL
-		,group : 'richdata'
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.historyUI = btn;
-	
-    return {
-        "events": [{
-            "element": btn.$,
-            "events": {
-                'click' : function(){
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					var historyPanel = editor.panels.historyUI;
-					
-					var pos = SinaEditor.util.dom.getXY(btn.$);
-					historyPanel.setPosition({x:pos[0],y:(pos[1]+btn.$.offsetHeight)});
-					historyPanel.show();
-				}
-            }
-        }]
-    };
-});
-//历史版本
-SinaEditor.plugins.add('historyUIPanel',function(args){
-	var editor = this;
-	var btn = null;
-	
-	var sid = args.id || 0;
-	var storage = SinaEditor.$abstract.Storage;
-	
-	var historyPanel = new SinaEditor._.Panel();
-	historyPanel.setTemplate(SinaEditor.TOOLCONF.historyTemplate);
-	
-	var panel = historyPanel.nodes.panel;
-	
-	var _addZero = function(data) {
-		return data < 10 ? '0'+data : data;
-	};
-	
-	editor.panels.historyUI = historyPanel;
-	editor.panels.historyUI.updataData = function() {
-		var datas = editor.operation.loadData() || [];
-		if(!datas.length) {
-			return;
-		}
-		var htmls = [];
-		var d,i;
-		for(i=0; datas[i]; i++) {
-			d = new Date(datas[i]);
-			htmls.push('<div time="');
-			htmls.push(datas[i]);
-			htmls.push('" >');
-			htmls.push(d.getFullYear());
-			htmls.push('-');
-			htmls.push(_addZero(d.getMonth()+1));
-			htmls.push('-');
-			htmls.push(_addZero(d.getDate()));
-			htmls.push('&nbsp;');
-			htmls.push(_addZero(d.getHours()));
-			htmls.push(':');
-			htmls.push(_addZero(d.getMinutes()));
-			htmls.push(':');
-			htmls.push(_addZero(d.getSeconds()));
-			htmls.push('</div>');
-		}
-		panel.innerHTML = htmls.join('');
-	};
-	
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-				'editorSelectionChange' : function(){
-					historyPanel.hidden();
-				}
-            }
-        },{
-            "element": panel,
-            "events": {
-				'click' : function(e){
-					var target = e.target;
-					var time = target.getAttribute('time');
-					if(target.tagName.toUpperCase() == 'DIV' && time) {
-						editor.operation.putData(time);
-						historyPanel.hidden();
-					}
-				}
-            }
-        },{
-            "element": document,
-            "events": {
-				'click' : function(e){
-					var btn = editor.btns.historyUI;
-					var target = e.target;
-					if(target === btn.$) {
-						return;
-					}
-					if(!SinaEditor.util.dom.containsNode(panel,target)) {
-						historyPanel.hidden();
-					}
-				}
-            }
-        }]
-    };
-});//当鼠标链接在IMG标签内时
-SinaEditor.plugins.add('imgBubble',function(){
-	return SinaEditor.$abstract.BaseBubblePlugin({
-        tagName: 'IMG',
-        applyStyles: SinaEditor.CONF.aBubbleStyles,
-        showBubble: function(node, editor) {
-			
-			if(node.getAttribute('_se_type')) {
-				return;
-			}
-			
-            var t = new Date().getTime();
-			var html,data;
-            var mid = 'i_m_b_' + t;
-            var did = 'i_d_b_' + t;
-			data = {
-                modifyid: mid,
-                deleteid: did
-            };
-			var href = node.href;
-			html = new SinaEditor.$abstract.Template(SinaEditor.CONF.imgBubbleTemplete);
-            var pos = SinaEditor.util.dom.getXY(node,true);
-			var iframePos = SinaEditor.util.dom.getXY(editor.enty,true);
-			if(iframePos[1] > pos[1]) {
-				pos[1] = iframePos[1];
-			}
-            var bubble = SinaEditor.baseBubble.showBubble(html.evaluate(data), {
-                x: pos[0],
-                y: pos[1]
-            });
-			
-			if(!SinaEditor.CONF.imgBubbleModify) {
-				bubble.id(mid).style.display = 'none';
-			} else {
-				bubble.id(mid).onclick = function(){
-					if (!SinaEditor.CONF.imgBubbleModify(node)) {
-						SinaEditor.baseBubble.hiddenBubble();
-					}
-					return false;
-				};
-			}
-			if(!SinaEditor.CONF.imgBubbleDelete) {
-				bubble.id(did).style.display = 'none';
-			} else {
-				bubble.id(did).onclick = function(){
-					if(!SinaEditor.CONF.imgBubbleDelete(node)) {
-						SinaEditor.baseBubble.hiddenBubble();
-					}
-					return false;
-				};
-			}
-        }
-    });
-}());
-
-//上传图片
-SinaEditor.plugins.add('imgUI',function(args){
-    var editor = this;
-    
-	if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'imgUIBtn',
-			'args' : args
-		});
-	}
-	
-	if (!args.customerPanel) {
-		editor.callPlugin({
-			'name' : 'imgUIPanel',
-			'args' : args
-		});
-	}
-	
-	if(!SinaEditor.CONF.imgBubbleModify) {
-		SinaEditor.CONF.imgBubbleModify = function(node){
-			var panel = editor.panels.imgUI;
-			panel.fromBubble = true;
-			panel.tmpNode = node;
-			editor.panels.imgUI.show();
-		};
-	}
-	
-	if(!SinaEditor.CONF.imgBubbleDelete) {
-		SinaEditor.CONF.imgBubbleDelete = function(node){
-			editor.operation.save(editor);
-			node.parentNode.removeChild(node);
-			editor.operation.save(editor);
-			editor.focus();
-		};
-	}
-});
-
-//上传图片
-SinaEditor.plugins.add('imgUIBtn',function(args){
-    var editor = this;
-
-	var btnConf = {
-		title:'插入图片',
-        normalClass: 'ico_img_1',
-        disabledClass: 'ico_img_4',
-        clickedClass: 'ico_img_3',
-        mouseoverClass: 'ico_img_2',
-        state: SinaEditor.BUTTONSTATE.NORMAL,
-        group: 'richdata'
-    };
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.imgUI = btn;
-    
-    return {
-		'events' : [{
-			"element": btn.$,
-            "events": {
-				'click' : function() {
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.panels.imgUI.show();
-					return false;
-				}
-            }
-		}]
-	};
-});
-
-//上传图片
-SinaEditor.plugins.add('imgUIPanel',function(args){
-    var editor = this;
-    var MAX_HEIGHT = 442;
-    var MAX_WIDTH = 630;
-    
-    var imgPanel = SinaEditor.winDialog.create({
-        title: '添加图片',
-        content: SinaEditor.TOOLCONF.imgTemplate,
-        funcClose: function(){
-			if(showMy) {
-				_backMy();
-			} else {
-				_backWeb();
-			}
-        }
-    });
-    
-    var useClient = imgPanel.nodes.useClient;
-    var clientView = imgPanel.nodes.clientView;
-    var clientFile = imgPanel.nodes.clientFile;
-    var contentLoading = imgPanel.nodes.contentLoading;
-    var cancleClient = imgPanel.nodes.cancleClient;
-    var resultPic = imgPanel.nodes.resultPic;
-    var addClientPic = imgPanel.nodes.addClientPic;
-    var webContent = imgPanel.nodes.webContent;
-    var webUrl = imgPanel.nodes.webUrl;
-    var clientResult = imgPanel.nodes.clientResult;
-	var errTips = imgPanel.nodes.errTips;
-	var clientIframe = imgPanel.nodes.clientIframe;
-	var resetClient = imgPanel.nodes.resetClient;
-	var clientUploadDiv = imgPanel.nodes.clientUploadDiv;
-	var clientMoreUp = imgPanel.nodes.clientMoreUp;
-	var clientForm = imgPanel.nodes.clientForm;
-	var tabMy = imgPanel.nodes.tabMy;
-	var tabWeb = imgPanel.nodes.tabWeb;
-	var webAdd = imgPanel.nodes.webAdd;
-	var webPic = imgPanel.nodes.webPic;
-	var webPicContainer = webPic.parentNode;
-	var webPicLoading = imgPanel.nodes.webPicLoading;
-	var clientFileDrag = imgPanel.nodes.clientFileDrag;
-	var showMy = true;
-	var _defaultUrlVal = 'http://';
-	var _inputInterval = null;
-	var _oldVal = _defaultUrlVal;
-	imgPanel.fromBubble = false;
-	imgPanel.tmpNode = null;
-	
-	var switchTab = function(isMy) {
-		if(showMy === !!isMy) {
-			return;
-		}
-		if(isMy) {
-			_backMy(true);
-			tabMy.className = 'cur';
-			webContent.style.display = 'none';
-			tabWeb.className = '';
-			useClient.style.display = '';
-		} else {
-			_backWeb(true);
-			tabMy.className = '';
-			useClient.style.display = 'none';
-			tabWeb.className = 'cur';
-			webContent.style.display = '';
-		}
-		showMy = !showMy;
-	};
-	
-    var _showClient = function(elm){
-        contentLoading.style.display = 'none';
-        clientView.style.display = 'none';
-        clientResult.style.display = 'none';
-        elm.style.display = '';
-    };
-	
-	var _errLogic = {
-		showErr : function(str,time) {
-			errTips.innerHTML = str;
-			errTips.style.display = '';
-	        if(time) {
-				var me = this;
-				setTimeout(function(){
-					me.hiddenErr();
-				},time*1000);
-			}
-	    },
-		hiddenErr : function() {
-			errTips.style.display = 'none';
-		}
-	};
-	
-	var resizeIMG = function(img) {
-		if (!img.src) {
-            return;
-        }
-		img.removeAttribute('width');
-        img.removeAttribute('height');
-        var width = img.width;
-        var height = img.height;
-        if (width < MAX_WIDTH && height < MAX_HEIGHT) {
-            return;
-        }
-		if(MAX_WIDTH / MAX_HEIGHT < width / height) {
-			img.width = MAX_WIDTH;
-		} else {
-			img.height = MAX_HEIGHT;
-		}
-	};
-	
-	var _backMy = function(noRest){
-		//resultPic.src = '';
-		_showClient(clientView);
-		_errLogic.hiddenErr();
-		if(!noRest) {
-			imgPanel.fromBubble = false;
-			imgPanel.tmpNode = null;
-		}
-		resultPic.src = '';
-	};
-	
-	var _backWeb = function(noRest){
-		_oldVal = _defaultUrlVal;
-		webUrl.value = _defaultUrlVal;
-		webAdd.style.display = 'none';
-		webPicContainer.style.display = 'none';
-		webPicLoading.style.display = 'none';
-		_errLogic.hiddenErr();
-		if(!noRest) {
-			imgPanel.fromBubble = false;
-			imgPanel.tmpNode = null;
-		}
-		webAdd.src = '';
-	};
-	
-	var _isImg = function(type) {
-		type = type || '';
-		if(!SinaEditor.TOOLCONF.imgType.test(type)) {
-			_errLogic.showErr(SinaEditor.TOOLCONF.imgErrTypeMSG,3);
-			return false;
-		}
-		return true;
-	};
-
-	//给支持拖拽的浏览器绑定事件
-	SinaEditor.ev.add(clientUploadDiv, 'dragenter', function(e){
-		clientMoreUp.style.display = '';
-		clientUploadDiv.style.borderStyle = 'dashed';
-	});
-	
-	SinaEditor.ev.add(clientUploadDiv, 'dragover', function(e){
-		SinaEditor.ev.stopEvent(e);
-	});
-	
-	SinaEditor.ev.add(clientUploadDiv, 'drop', function(e){
-		SinaEditor.ev.stopEvent(e);
-		clientUploadDiv.style.borderStyle = 'solid';
-		clientMoreUp.style.display = 'none';
-		var file = e.dataTransfer.files;
-		if(file.length) {
-			file = file[0];
-		}
-		if(!_isImg(file.name)) {
-			return;
-		}
-		var reader = new FileReader();
-		reader.onload = function (e) {
-			clientFileDrag.value = e.target.result;
-			clientForm.submit();
-			_showClient(contentLoading);
-			clientFileDrag.value = '';
-		};
-		reader.readAsDataURL(file);
-	});
-	
-	SinaEditor.ev.add(clientUploadDiv, 'dragleave', function(e){
-		clientUploadDiv.style.borderStyle = 'solid';
-		clientMoreUp.style.display = 'none';
-	});
-
-	
-	editor.panels.imgUI = imgPanel;
-	
-	return {
-		"events": [{
-            "element": webUrl,
-            "events": {
-				'focus' : function() {
-					_inputInterval = setInterval(function(){
-						var newVal = webUrl.value;
-						if(newVal != _oldVal) {
-							_oldVal = newVal;
-							webPicContainer.style.display = 'none';
-							webPicLoading.style.display = '';
-							var img = new Image();
-							img.onload = function() {
-								webPic.src = img.src;
-								setTimeout(function(){
-									resizeIMG(webPic);
-									_errLogic.hiddenErr();
-									webPicLoading.style.display = 'none';
-									webPicContainer.style.display = '';
-									webAdd.style.display = '';
-								},1);
-							};
-							img.onerror = function() {
-								webAdd.style.display = 'none';
-								//TODO 放到配置里
-								_errLogic.showErr('您输入的图片不是正确的地址，请重新输入。');
-								webPicContainer.style.display = 'none';
-								webPicLoading.style.display = 'none';
-							};
-							img.src = webUrl.value;
+					if(this.getState() === SinaEditor.STATE.CREATED) {
+						if(scope.$pageid === 'index') {
+							editor.operation.qingLoadData();
 						}
-					},1000);
-				}
-				,'blur' : function() {
-					clearInterval(_inputInterval);
-				}
-            }
-        },{
-            "element": tabMy,
-            "events": {
-				'click' : function() {
-					switchTab(true);
-				}
-            }
-        },{
-            "element": tabWeb,
-            "events": {
-				'click' : function() {
-					switchTab(false);
-				}
-            }
-        },{
-            "element": addClientPic,
-            "events": {
-				'click' : function() {
-					if(imgPanel.fromBubble) {
-						imgPanel.tmpNode.src = resultPic.src;
-						imgPanel.hidden();
-						_backMy();
-						return;
 					}
-					var img = SinaEditor.util.dom.createDom('img',{
-						'ownerDocument' : editor.entyDoc,
-						properties : {
-							src : resultPic.src
-						}
-					});
-					editor.operation.addNode(img,true);
-					imgPanel.hidden();
-					_backMy();
 				}
             }
         },{
-            "element": webAdd,
+            "element": window,
             "events": {
-				'click' : function() {
-					if(imgPanel.fromBubble) {
-						imgPanel.tmpNode.src = webPic.src;
-						imgPanel.hidden();
-						_backWeb();
-						return;
-					}
-					var img = SinaEditor.util.dom.createDom('img',{
-						ownerDocument : editor.entyDoc,
-						properties : {
-							src : webPic.src
-						}
-					});
-					editor.operation.addNode(img,true);
-					imgPanel.hidden();
-					_backWeb();
-				}
-            }
-        },{
-            "element": resetClient,
-            "events": {
-				'click' : function() {
-					resultPic.src = '';
-					_showClient(clientView);
-				}
-            }
-        },{
-            "element": clientUploadDiv,
-            "events": {
-				'mousemove' : function(e) {
-					var pos = SinaEditor.util.dom.getXY(clientUploadDiv),
-						scroll = SinaEditor.util.dom.getScrollPos(),
-						//[LEFT,TOP]的偏差值
-						ps = [10,15];
-					if(SinaEditor.env.$IE) {
-						ps[0] = 200;
-					}
-					clientFile.style.left = (e.clientX - pos[0] - ps[0] + scroll[1]) + 'px';
-					clientFile.style.top = (e.clientY - pos[1] -ps[1] + scroll[0]) + 'px';
-				}
-            }
-        },/*{
-            "element": resultPic,
-            "events": {
-				'load' : function() {
-					resizeIMG(resultPic);
-				}
-            }
-        },{
-            "element": webPic,
-            "events": {
-				'load' : function() {
-					resizeIMG(webPic);
-					_errLogic.hiddenErr();
-					webPicContainer.style.display = '';
-					webPicLoading.style.display = 'none';
-					webAdd.style.display = '';
-				},'error' : function() {
-					webAdd.style.display = 'none';
-					//TODO 放到配置里
-					_errLogic.showErr('您输入的图片不是正确的地址，请重新输入。');
-					webPicContainer.style.display = 'none';
-					webPicLoading.style.display = 'none';
-				}
-            }
-        },*/{
-            "element": cancleClient,
-            "events": {
-				'click' : function() {
-					clientIframe.src = '';
-					_showClient(clientView);
-				}
-            }
-        },{
-            "element": clientIframe,
-            "events": {
-				'load' : function() {
-					console.log('.......客户端的华丽家在！！！');
+				'beforeunload' : function() {
 					try {
-						var val = clientIframe.contentWindow.document.body.innerHTML;
-						if(!val) {
-							console.log('没有加载东西！虚报');
-							return;
+						if(scope.$pageid === 'index') {
+							//编辑器是直接被替换的，而不是删除，所以判断一下是不是被删除了。
+							editor.operation.qingSaveData();
 						}
-						_showClient(clientResult);
-						clientIframe.contentWindow.document.body.innerHTML = '';
-						var img = new Image();
-						img.onload = function() {
-							resultPic.src = val;
-							setTimeout(function(){
-								resizeIMG(resultPic);
-							},1);
-						};
-						img.src = val;
-					} catch(e) {}
-				}
-            }
-        },{
-            "element": clientFile,
-            "events": {
-				'change' : function() {
-					if(!_isImg(clientFile.value)) {
-						return;
-					}
-					clientForm.submit();
-					_showClient(contentLoading);
+					} catch (e) {}
 				}
             }
         }]
-	};
-});
-//增加缩进
-SinaEditor.plugins.add('indent',function(args){
-	var editor = this;
-	
-	if(!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'indentBtn',
-			'args' : args
-		});
-	}
-	
-	/**
-	 * #BLOGBUG-12323 在表格内使用此方法，使用并取消，在webkit下会在table的顶上生成一个br标签。
-	 * #BLOGBUG-12324 在webkit下输入一行文字，全选(非全选不存在此缺陷)，设置背景色，再使用此方法，颜色丢失，span标签丢失。
-	 * 增加缩进
-	 */
-	editor.operation.indent = function(){
-		editor.focus();
-        editor.operation.save(editor);
-		
-		editor.entyDoc.execCommand("indent",false,'');
-		
-        editor.operation.save(editor);
-		editor.focus();
-    };
-});
-//增加缩进
-SinaEditor.plugins.add('indentBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'增加缩进',
-		normalClass : 'ico_indent_1'
-		,disabledClass : 'ico_indent_4'
-		,clickedClass : 'ico_indent_3'
-		,mouseoverClass : 'ico_indent_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.indent = btn;
-	
-    return {
-        'initialize': function(){
-        },
-        "events": [{
-            "element": btn.$,
-            "events": {
-				'click' : function() {
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.operation.indent();
-					return false;
-				}
-            }
-        }]
-    };
-});
-/**
- * 初始化编辑器的方法
- */
-SinaEditor.plugins.add('initFromStatic',function(args){
-	var editor = this;
-    function init(){
-        editor.entyWin = editor.enty.contentWindow;
-        editor.entyDoc = editor.entyWin.document;
-        editor.entyBody = editor.entyDoc.body;
-        
-        editor.entyBody.spellcheck = !!editor.option.disableNativeSpellChecker;
-        if (SinaEditor.env.$IE) {
-            editor.entyBody.hideFocus = true;
-            editor.entyBody.disabled = true;
-            editor.entyBody.contentEditable = true;
-            editor.entyBody.removeAttribute('disabled');
-        }
-        else {
-            setTimeout(function(){
-                if (SinaEditor.env.$GENKO) {
-					//editor.entyDoc.designMode = 'on';
-                    editor.entyBody.contentEditable = true;
-                    var fFocus = false;
-                    //修正在FF下，iframe样式修改造成的不能再编辑问题。
-                    SinaEditor.ev.add(editor.enty, 'DOMAttrModified', function(e){
-                        var an = e.attrName.toUpperCase();
-                        if (an == 'CLASS' || an == 'STYLE') {
-                            editor.entyBody.contentEditable = false;
-                            editor.entyBody.contentEditable = true;
-                            editor.entyWin.blur();
-                            editor.entyWin.focus();
-                        }
-                    });
-                }
-                else 
-                    if (SinaEditor.env.$WEBKIT) {
-                        editor.entyBody.parentNode.contentEditable = true;
-                    }
-                    else {
-                        editor.entyDoc.designMode = 'on';
-                    }
-            }, 0);
-        }
-        
-        setTimeout(function(){
-            try {
-                editor.entyDoc.execCommand('enableObjectResizing', false, !editor.option.disableObjectResizing);
-            } 
-            catch (e) {
-            }
-            try {
-                editor.entyDoc.execCommand('enableInlineTableEditing', false, !editor.option.disableNativeTableHandles);
-            } 
-            catch (e) {
-            }
-			
-            if (SinaEditor.env.$IE <= 6) {
-				try{
-					//图标被重复的请求
-					document.execCommand("BackgroundImageCache", false, true);
-				}catch(e){}
-                setTimeout(function(){
-                    var doc = editor.entyDoc;
-                    if (doc) {
-                        var $body = doc.body;
-                        $body.runtimeStyle.marginBottom = '0px';
-                        $body.runtimeStyle.marginBottom = '';
-                    }
-                }, 1000);
-            }
-        }, 0);
-		
-		if(SinaEditor.env.$IE) {
-			var sc = SinaEditor.util.dom.createDom('script', {
-	            'ownerDocument': editor.entyDoc,
-	            'attributes': {
-					'type':'text/javascript',
-	                'src':window.location.href.substring(0,window.location.href.lastIndexOf('/')+1)+'ierange-m2.js?'+SinaEditor.version
-	            }
-	        });
-			
-			editor.entyDoc.getElementsByTagName('head')[0].appendChild(sc);
-		}
-        
-        if (editor.option.styleLinks) {
-            var links = editor.option.styleLinks;
-			var i;
-            for (i = 0; links[i]; i++) {
-                SinaEditor.util.dom.addLink(links[i], editor.entyDoc);
-            }
-        }
-		
-        if (editor.option.styles) {
-            SinaEditor.util.dom.addStyles(editor.option.styles, editor.entyDoc);
-        }
-    }
-    
-    var func = 'document.open();' +
-			    (SinaEditor.env.isCustomDomain ? 'document.domian="' + document.domain + '";' : '') +
-			    'document.close();';
-    
-    var iframe = SinaEditor.util.dom.createDomFromHTML('<iframe' +
-			    ' style="width:100%;height:100%;z-index:999;"' +
-			    ' frameBorder="0"' +
-			    ' src="' +
-			    (SinaEditor.env.$IE ? 'javascript:void(function(){' + encodeURIComponent(func) + '}())' : '') +
-			    '"' +
-			    ' allowTransparency="true"' +
-			    '></iframe>');
-    editor.enty = iframe;
-    SinaEditor.ev.add(iframe, 'load', init);
-    args.parent.appendChild(iframe);
-});
-
-//用于斜体字
-//通过添加strong标签和移除strong标签来达到
-SinaEditor.plugins.add('italic',function(args){
-	var editor = this;
-	
-	if(!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'italicBtn',
-			'args' : args
-		});
-	}
-	
-	var btn = editor.btns.italic;
-	
-	/**
-	 * 斜体，isAdd可能是参照节点，也可能是一个boolean值
-	 * @param {Object} isAdd
-	 */
-	editor.operation.italic = function(){
-		var ranges = SinaEditor.range.getCurrentRanges(editor.entyWin);
-		//TODO 和IE统一，暂时只支持第一个选区
-		ranges = ranges[0];
-		if(!ranges) {
-			return;
-		}
-		var text = ranges.toString();
-        editor.operation.save(editor);
-		
-		//var isItalic = editor.operateState['italic'];
-		var isItalic = editor.operateState.italic;
-		
-		if(isItalic) {
-			console.log('执行去斜体操作');
-			SinaEditor.range.removeStyle(editor, {
-	            'useTagName': ['i','em']
-	        });
-			//#BLOGBUG-12284 safari 4.0竟然会在操作对齐时把它转化成样式的形式。
-			SinaEditor.range.removeStyle(editor, {
-	            'useTagName': 'span',
-				'style': 'fontStyle'
-	        });
-			btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
-		} else {
-			console.log('执行斜体操作');
-			SinaEditor.range.applyStyle(editor, {
-	            'useTagName': 'em'
-	        });
-			btn.setState(SinaEditor.BUTTONSTATE.CLICKED);
-		}
-        
-		//editor.operateState['italic'] = !isItalic;
-		editor.operateState.italic = !isItalic;
-        editor.operation.save(editor);
-    };
-	
-	
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-				'editorSelectionChange' : function(e,range,refNode) {
-					var isItalic = SinaEditor.range.queryCommandState(this.entyDoc,'italic');
-					
-					if(isItalic) {
-						btn.setState(SinaEditor.BUTTONSTATE.CLICKED);
-					} else {
-						btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
-					}
-					
-					//this.operateState['italic'] = isItalic;
-					this.operateState.italic = isItalic;
-				}
-				,'ctrli' : function() {
-					editor.operation.italic(this);
-				}
-            }
-        }]
-    };
-});
-//用于斜体字
-//通过添加strong标签和移除strong标签来达到
-SinaEditor.plugins.add('italicBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'斜体',
-		normalClass : 'ico_italic_1'
-		,disabledClass : 'ico_italic_4'
-		,clickedClass : 'ico_italic_3'
-		,mouseoverClass : 'ico_italic_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'common'
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.italic = btn;
-	
-    return {
-        "events": [{
-			'element' : btn.$,
-			'events' : {
-				'click' : function() {
-					if(editor.btns.italic.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.operation.italic();
-					return false;
-				}
-			}
-		}]
     };
 });
 //居中
@@ -7441,12 +5523,12 @@ SinaEditor.plugins.add('justifycenterBtn',function(args){
 
 	var btnConf = {
 		title:'居中',
-		normalClass : 'ico_justifycenter_1'
-		,disabledClass : 'ico_justifycenter_4'
-		,clickedClass : 'ico_justifycenter_3'
-		,mouseoverClass : 'ico_justifycenter_2'
+		normalClass : 'func_center'
+		,disabledClass : 'func_center'
+		,clickedClass : 'func_center_hover'
+		,mouseoverClass : 'func_center_hover'
 		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
+		,group : 'c'
 	};
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
@@ -7500,12 +5582,12 @@ SinaEditor.plugins.add('justifyleftBtn',function(args){
 	
 	var btnConf = {
 		title:'居左',
-		normalClass : 'ico_justifyleft_1'
-		,disabledClass : 'ico_justifyleft_4'
-		,clickedClass : 'ico_justifyleft_3'
-		,mouseoverClass : 'ico_justifyleft_2'
+		normalClass : 'func_left'
+		,disabledClass : 'func_left'
+		,clickedClass : 'func_left_hover'
+		,mouseoverClass : 'func_left_hover'
 		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
+		,group : 'l'
 	};
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
@@ -7560,12 +5642,12 @@ SinaEditor.plugins.add('justifyrightBtn',function(args){
 
 	var btnConf = {
 		title:'居右',
-		normalClass : 'ico_justifyright_1'
-		,disabledClass : 'ico_justifyright_4'
-		,clickedClass : 'ico_justifyright_3'
-		,mouseoverClass : 'ico_justifyright_2'
+		normalClass : 'func_right'
+		,disabledClass : 'func_right'
+		,clickedClass : 'func_right_hover'
+		,mouseoverClass : 'func_right_hover'
 		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
+		,group : 'r'
 	};
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
@@ -7589,588 +5671,108 @@ SinaEditor.plugins.add('justifyrightBtn',function(args){
         }]
     };
 });
-(function () {
-    //当鼠标链接在A标签内时
-    SinaEditor.plugins.add('linkBubble',SinaEditor.$abstract.BaseBubblePlugin({
-        tagName: 'A',
-        applyStyles: SinaEditor.CONF.aBubbleStyles,
-        showBubble: function(node, editor){
-			var href = node.href;
-			if(!href) {
-				return;
-			}
-            var t = new Date().getTime();
-			var html,data;
-            var mid = 'a_m_b_' + t;
-            var did = 'a_d_b_' + t;
-			data = {
-                modifyid: mid,
-                deleteid: did
-            };
-			var mailTo = href.match(/^mailto:(.*$)/i);
-			if(mailTo) {
-				html = new SinaEditor.$abstract.Template(SinaEditor.CONF.mailBubbleTemplete);
-				data.srcstr = subStr(mailTo[1]);
-			} else {
-				html = new SinaEditor.$abstract.Template(SinaEditor.CONF.aBubbleTemplete);
-				data.src = decodeURI(href);
-				data.srcstr = subStr(decodeURI(href));
-			}
-            var pos = SinaEditor.util.dom.getXY(node,true);
-			var iframePos = SinaEditor.util.dom.getXY(editor.enty,true);
-			pos[1] -= node.offsetHeight;
-			if(iframePos[1] > pos[1]) {
-				pos[1] = iframePos[1];
-			}
-			//#BLOGBUG-12252 链接文字折行后，定位会不准确
-            var bubble = SinaEditor.baseBubble.showBubble(html.evaluate(data), {
-                x: pos[0],
-                y: pos[1]
-            });
-			if(!SinaEditor.CONF.aBubbleModify) {
-				bubble.id(mid).style.display = 'none';
-			} else {
-				bubble.id(mid).onclick = function(){
-					if (!SinaEditor.CONF.aBubbleModify(node)) {
-						SinaEditor.baseBubble.hiddenBubble();
-					}
-					return false;
-				};
-			}
-			if(!SinaEditor.CONF.aBubbleDelete) {
-				bubble.id(did).style.display = 'none';
-			} else {
-				bubble.id(did).onclick = function(){
-					if(!SinaEditor.CONF.aBubbleDelete(node)) {
-						SinaEditor.baseBubble.hiddenBubble();
-					}
-					return false;
-				};
-			}
-			/*
-			SinaEditor.CONF.aBubbleDelete = SinaEditor.CONF.aBubbleDelete || function(){
-                
-				editor.operation.save(editor);
-			
-				var children = node.childNodes;
-				SinaEditor.range.setStartBefore(editor.entyWin,node);
-				node.parentNode.removeChild(node);
-				var len = children.length - 1;
-				
-				for(var i=len; i>=0; i--) {
-					SinaEditor.range.insertNode(editor.entyWin,children[i]);
-				}
-				
-                SinaEditor.baseBubble.hiddenBubble();
-				editor.focus();
-				
-				editor.operation.save(editor);
-            };
-            */
-            
-        }
-    }));
-	
-	function subStr(str){
-        var newStr = [];
-        var len = str.length;
-        if (len > 30) {
-            newStr.push(str.substring(0, 15));
-            newStr.push(str.substring(len - 15, len));
-            return newStr.join('...');
-        }
-        else {
-            return str;
-        }
-    }
-}());
-
-//插入链接
-SinaEditor.plugins.add('link',function(args){
-    var editor = this;
-    var btn = null;
-    
-    if (!args.customerPanel) {
-       editor.callPlugin({
-			'name' : 'linkPanel',
-			'args' : args
-		});
-    }
-	
-	if (!args.customerBtn) {
-       editor.callPlugin({
-			'name' : 'linkBtn',
-			'args' : args
-		});
-    }
-    
-    /**
-     * 添加链接，根据参数传递的情况决定如何操作
-     * 1.有选中文字：首先会清理掉里面所有的A标签
-     * 	a.不传递：检测选区中的a标签，全部清除。
-     * 	b.传递link：选区包裹上以A标签作为链接。
-     * 	c.传递link,str：忽略str,同操作1b。
-     * 2.没有选中文字：
-     * 	a.不传递：不做任何操作。
-     * 	b.传递link:以link作为str来生成链接
-     * 	c.传递link,str:添加链接。
-     * @param {Object} opt_obj 包含多种可选参数：
-     * 	link 链接
-     * 	str 文字
-     * 	range 当前的选区
-     * 	elm 传递的节点，一定是A标签，如果包含有link，那么则替换elm的地址，没有，那么删除A标签的地址
-     */
-    editor.operation.link = function(optObj){
-		editor.focus();
-        var range = optObj.range || SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
-		var link = optObj.link;
-		var str = optObj.str || link;
-		
-        if (!link && !range) {
-            //2a.不传递：不做任何操作。
-			console.log("2a.不传递：不做任何操作。");
-            return;
-        }
-        
-        editor.operation.save(editor);
-		
-		if(optObj.elm) {
-			var elm = optObj.elm;
-			if(optObj.link) {
-				elm.href = encodeURI(optObj.link);
-				range.selectNodeContents(elm);
-				SinaEditor.range.applyRanges(editor.entyWin, range);
-			} else {
-				SinaEditor.util.dom.removeTag(elm);
-			}
-		} else {
-			var a = SinaEditor.util.dom.createDom('a', {
-				ownerDocument: editor.entyDoc,
-	            properties: {
-	                'target': '_blank'
-	            }
-	        });
-
-	        if (!range || range && range.collapsed) {
-	            //2b,c.添加链接。 
-				a.innerHTML = str;
-				a.href = encodeURI(link);
-	            //range ? range.insertNode(a) : editor.entyBody.appendChild(a);
-				if(range) {
-					range.insertNode(a);
-				} else {
-					editor.entyBody.appendChild(a);
-				}
-				range.selectNodeContents(a);
-				SinaEditor.range.applyRanges(editor.entyWin, range);
-	        } else {
-				//1a：检测选区中的a标签，全部清除。
-//				SinaEditor.range.removeStyle(editor, {
-//	                'useTagName': 'a'
-//	            });
-				editor.entyDoc.execCommand('unlink',false,'');
-				
-		        if(link) {
-					//1bc:选区包裹上以A标签作为链接。
-					a.href = encodeURI(link);
-					//#BLOGBUG-12256
-					//之前的操作破坏了选区，需要重新获取(有些浏览器的currentRange不是同一个引用)
-					range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
-					try {
-						//在跨节点时会报错
-						range.surroundContents(a);
-					} catch(e) {
-						var content = range.extractContents();
-						a.appendChild(content);
-						range.insertNode(a);
-					}
-					range.selectNodeContents(a);
-					SinaEditor.range.applyRanges(editor.entyWin, range);
-					//#BLOGBUG-12345 转中文不给力啊。
-					//editor.entyDoc.execCommand('createLink',false,encodeURIComponent(link));
-				}
-	        }
-		}
-        
-        editor.operation.save(editor);
-    };
-});
-
-//插入链接的按钮
-SinaEditor.plugins.add('linkBtn',function(args){
-    var editor = this;
-	var linkPanel = editor.panels.link;
-	var hidden = linkPanel.nodes.hidden;
-	
-	var btnConf = {
-		title:' 插入链接',
-        normalClass: 'ico_link_1',
-        disabledClass: 'ico_link_4',
-        clickedClass: 'ico_link_3',
-        mouseoverClass: 'ico_link_2',
-        state: SinaEditor.BUTTONSTATE.DISABLED,
-        group: 'common'
-    };
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.link = btn;
-	
-	return {
-		"events": [{
-            "element": btn.$,
-            "events": {
-                'click' : function() {
-					if(editor.btns.link.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
-					var str = range.toString();
-					if(SinaEditor.TOOLCONF.addLinkNow && SinaEditor.TOOLCONF.addLinkNow.test(str)) {
-						editor.operation.link({'link':str,'range':range});
-					} else {
-						if(range.collapsed) {
-							hidden.style.display = '';
-						}
-						linkPanel.show();
-					}
-                    return false;
-				}
-            }
-        }]
-	};
-});
-
-//插入链接的弹出浮层
-SinaEditor.plugins.add('linkPanel',function(args){
-    var editor = this;
-	
-    var linkPanel = SinaEditor.winDialog.create({
-        title: '添加链接',
-        content: SinaEditor.TOOLCONF.linkTemplate,
-		funcClose:function(){
-			_back();
-		}
-    });
-	
-    linkPanel.setMiddle();
-    linkPanel.setFixed(true);
-    
-    var okNode = linkPanel.nodes.ok;
-    var cancelNode = linkPanel.nodes.cancel;
-    var textNode = linkPanel.nodes.text;
-	var hiddNode = linkPanel.nodes.hidden;
-    var linkNode = linkPanel.nodes.link;
-	var _tmpNode;
-    
-	var _back = function() {
-		hiddNode.style.display = 'none';
-		_tmpNode = null;
-        textNode.value = '';
-		linkNode.value = 'http://';
-	};
-	
-	editor.panels.link = linkPanel;
-	
-	//link浮层的代码
-    SinaEditor.CONF.aBubbleModify = function(node) {
-		linkNode.value = decodeURI(node.href);
-		_tmpNode = node;
-		linkPanel.show();
-	};
-	
-	SinaEditor.CONF.aBubbleDelete = function(node) {
-		editor.operation.link({'elm':node});
-	};
-	
-    return {
-        "events": [{
-            "element": okNode,
-            "events": {
-                'click': function(){
-					editor.operation.link({
-						'link' : linkNode.value,
-						'str' : textNode.value,
-						'elm' : _tmpNode
-					});
-					_back();
-					linkPanel.hidden();
-                }
-            }
-        },{
-            "element": cancelNode,
-            "events": {
-                'click': function(){
-                    _back();
-        			linkPanel.hidden();
-                }
-            }
-        }]
-    };
-});
-
-//项目符号
-//添加ul标签
-SinaEditor.plugins.add('markList',function(args){
-	var editor = this;
-	var btn = null;
-	
-	if(!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'markListBtn',
-			'args' : args
-		});
-	}
-	
-	/**
-	 * 添加项目符号
-	 */
-	editor.operation.markList = function(){
-        editor.operation.save(editor);
-		
-		editor.entyDoc.execCommand("insertunorderedlist",'','');
-		editor.focus();
-		
-        editor.operation.save(editor);
-    };
-});
-//项目符号
-//添加ul标签
-SinaEditor.plugins.add('markListBtn',function(args){
-	var editor = this;
-	
-	var btnConf = {
-		title:'项目符号',
-		normalClass : 'ico_marklist_1'
-		,disabledClass : 'ico_marklist_4'
-		,clickedClass : 'ico_marklist_3'
-		,mouseoverClass : 'ico_marklist_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.markList = btn;
-	
-    return {
-        "events": [{
-            "element": btn.$,
-            "events": {
-				'click' : function() {
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.operation.markList();
-					return false;
-				}
-            }
-        }]
-    };
-});
-//数字符号
-//添加ol标签
-SinaEditor.plugins.add('numberList',function(args){
-	var editor = this;
-	var btn = null;
-	
-	if(!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'numberListBtn',
-			'args' : args
-		});
-	}
-	
-	/**
-	 * 添加项目符号
-	 */
-	editor.operation.numberList = function(){
-        editor.operation.save(editor);
-		
-		editor.focus();
-		editor.entyDoc.execCommand("insertorderedlist",'','');
-		
-        editor.operation.save(editor);
-    };
-});
-//数字符号
-//添加ol标签
-SinaEditor.plugins.add('numberListBtn',function(args){
-	var editor = this;
-	
-	var btnConf = {
-		title:'数字符号',
-		normalClass : 'ico_numberlist_1'
-		,disabledClass : 'ico_numberlist_4'
-		,clickedClass : 'ico_numberlist_3'
-		,mouseoverClass : 'ico_numberlist_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.numberList = btn;
-	
-    return {
-        "events": [{
-            "element": btn.$,
-            "events": {
-				'click' : function() {
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.operation.numberList();
-					return false;
-				}
-            }
-        }]
-    };
-});
-//减少缩进
-SinaEditor.plugins.add('outdent',function(args){
-	var editor = this;
-	
-	if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'outdentBtn',
-			'args' : args
-		});
-	}
-	
-	/**
-	 * 添加项目符号
-	 */
-	editor.operation.outdent = function(){
-		editor.focus();
-        editor.operation.save(editor);
-		
-		editor.entyDoc.execCommand("outdent",'','');
-		
-        editor.operation.save(editor);
-		editor.focus();
-    };
-});
-//减少缩进
-SinaEditor.plugins.add('outdentBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'减少缩进',
-		normalClass : 'ico_outdent_1'
-		,disabledClass : 'ico_outdent_4'
-		,clickedClass : 'ico_outdent_3'
-		,mouseoverClass : 'ico_outdent_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'composing'
-	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.outdent = btn;
-	
-    return {
-        "events": [{
-            "element": btn.$,
-            "events": {
-				'click' : function() {
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
-						return false;
-					}
-					editor.operation.outdent();
-					return false;
-				}
-            }
-        }]
-    };
-});
 //粘贴过滤
 
-SinaEditor.plugins.add('pasteFilter', function(args){
+SinaEditor.plugins.add('qingFilter', function(args){
     var editor = this;
+	var filterTag = {'SCRIPT':1,'INPUT':1,'IFRAME':1,'TEXTAREA':1,'INPUT':1,'BUTTON':1,'OBJECT':1,'EMBED':1};
+	var noFilterTag = {'STRONG': 1,'B': 1,'IMG': 1,'P': 1,'A' : 1};
     editor.operation.pasteFilter = function(){
-        var argus = editor.option.filter.args;
-		var i=0;
-        //var tags = argus['tagName'];
-		var tags = argus.tagName;
-        if (tags) {
-            tags = tags.split('|');
-            var tag, eles;
-            while (tags[i]) {
-                eles = editor.entyDoc.getElementsByTagName(tags[i]);
-                while (eles[0]) {
-                    SinaEditor.util.dom.delElement(eles[0]);
-                }
-                i++;
+		filterForbidden();
+        //try {
+			var start = editor.entyDoc.createElement('span');
+			start.innerHTML = '&nbsp;';
+			editor.entyBody.insertBefore(start,editor.entyBody.firstChild);
+			var end = editor.entyDoc.createElement('span');
+			end.innerHTML = '&nbsp;';
+			editor.entyBody.appendChild(end);
+			_getNextNode(start,end,function(elm){
+				if(elm.nodeType === 1) {
+					var up = elm.tagName.toUpperCase();
+					if(noFilterTag[up]) {
+						elm.style.cssText = '';
+						return;
+					}
+					if(up === 'DIV') {
+						var ta = elm.style.textAlign;
+						elm.style.cssText = 'text-align:'+ ta;
+						return;
+					}
+					if(up !== 'BR') {
+						SinaEditor.util.dom.removeTag(elm);
+					}
+				}
+			});
+			start.parentNode.removeChild(start);
+			end.parentNode.removeChild(end);
+		//} catch(e){console.log(e);}
+    };
+	
+	
+	/**
+     * 深度优先遍历节点
+     * @param {Object} begin 起始节点，肯定是BOOKMARK的起始点
+     * @param {Object} end 结束节点，BOOKMARK的结束点
+     * @param {Function} func 回调函数
+     */
+    var _getNextNode = function(begin, end, callBack){
+        var current = __getNextElement(begin, true);
+		//debugger;
+        while (current && current != end) {
+            //保留第一个元素，当它被摧毁时(如删除这个标签)，可以依然找到下一个节点
+            var handleEle = current;
+            current = __getNextElement(current);
+			if(handleEle.nodeType === SinaEditor.NODETYPE.TEXT || (handleEle.nodeType === SinaEditor.NODETYPE.ELEMENT && !SinaEditor.util.dom.containsNode(handleEle,end))) {
+				callBack(handleEle);
+			}
+        }
+    };
+    
+    /**
+     * 获得下一个可用的节点
+     * 1.有子节点。返回第一个子节点。
+     * 2.无子节点：
+     * 	a.有下一个兄弟节点。返回下一个兄弟节点。
+     * 	b.无下一个兄弟节点。向上到父节点，再进行判断。
+     * @param {Object} elm 当前节点
+     * @return {Element} 下一个可用的节点，出现问题直接抛出异常
+     */
+    var __getNextElement = function(elm, skipChildren){
+        //首先检测是不是有子节点
+        if (elm.hasChildNodes() && !skipChildren) {
+            var firstEl = elm.firstChild;
+            if (firstEl) {
+                return firstEl;
             }
         }
-        //var atts = argus['attribute'];
-		var atts = argus.attribute;
-        if (atts) {
-            atts = atts.split('|');
-            walkElment(editor.entyDoc.body, atts);
+        //查找兄弟节点
+        var nextEl = elm.nextSibling;
+        while (!nextEl) {
+            nextEl = elm.parentNode;
+            //父节点肯定有tagName
+			if (nextEl.tagName.toUpperCase() == 'HTML') {
+                //到达了最高级
+                throw '确定在遍历节点时有结束标记的节点?';
+            }
+            //鸡肋
+            elm = nextEl;
+            nextEl = elm.nextSibling;
         }
-		i=0;
-		var imgs = editor.entyDoc.getElementsByTagName('img');
-		for(;imgs[i]; i++ ) {
-			if(imgs[i].src.indexOf('file:///') === 0) {
-				SinaEditor.util.dom.delElement(imgs[i]);
+        return nextEl;
+    };
+	
+	
+	var filterForbidden = function(){
+		var i=0,
+			tags = editor.entyBody.getElementsByTagName('*');
+		while(tags[i]) {
+			if(tags[i].nodeType === 1 && filterTag[tags[i].tagName.toUpperCase()]) {
+				SinaEditor.util.dom.removeTag(tags[i]);
 				i--;
 			}
+			i++;
 		}
-    };
-    
-    var walkElment = function(elmens, atts){
-        if (elmens.nodeType !== SinaEditor.NODETYPE.ELEMENT) {
-            return;
-        }
-        var i = 0;
-        while (atts[i]) {
-            elmens.removeAttribute(atts[i]);
-            i++;
-        }
-        i = 0;
-        if (elmens.hasChildNodes()) {
-            var childNodes = elmens.childNodes;
-            while (childNodes[i]) {
-                walkElment(childNodes[i], atts);
-                i++;
-            }
-        }
-    };
-    
-    //自定义事件之后才执行到
-    
-    var exChangeObject = function(objects){
-        var img, i = 0;
-        while (objects[i]) {
-            img = SinaEditor.util.dom.createDomFromHTML('<img src="'+SinaEditor.CONF.transparentIMG+'" _se_flash="' + encodeURIComponent(SinaEditor.util.dom.outerHTML(objects[i])) + '" width="' + objects[i].width + '" height="' + objects[i].height + '" style="background:url(\''+SinaEditor.CONF.fakeFLASH+'\') no-repeat scroll center center transparent;border:1px solid #A9A9A9;" >', editor.entyDoc);
-            objects[i].parentNode.replaceChild(img, objects[i]);
-        }
-    };
-    
-    var exChangeObjectBack = function(){
-        var imgs = editor.entyDoc.getElementsByTagName('img');
-        var attStr, flash, i = 0;
-        while (imgs[i]) {
-            attStr = imgs[i].getAttribute('_se_flash');
-            if (attStr) {
-                flash = SinaEditor.util.dom.createDomFromHTML(decodeURIComponent(attStr), editor.entyDoc);
-                imgs[i].parentNode.replaceChild(flash, imgs[i]);
-            }
-            else {
-                i++;
-            }
-        }
-    };
+	};
     
     return {
         "events": [{
@@ -8181,33 +5783,250 @@ SinaEditor.plugins.add('pasteFilter', function(args){
                     setTimeout(function(){
 						var i=0,tds;
 						editor.operation.pasteFilter();
-						exChangeObject(editor.entyDoc.getElementsByTagName('object'));
-                        exChangeObject(editor.entyDoc.getElementsByTagName('embed'));
-						//#BLOGBUG-12333 从word粘贴无内容的table，缩成一团。
-						tds = editor.entyDoc.getElementsByTagName('td');
-						for(i=0; tds[i]; i++) {
-							var val = tds[i].textContent || tds[i].textContent;
-							if(!val) {
-								tds[i].innerHTML = '&nbsp;';
-							}
-						}
                     }, 10);
                 }
             }
-        }, {
-            "element": editor,
+        }]
+    };
+});
+
+
+SinaEditor.plugins.add('showSource', function(args){
+    var editor = this;
+    //创建textarea
+    editor.entyArea = args.entyArea;
+    if (!editor.entyArea) {
+        var area = SinaEditor.util.dom.createDom('textarea', {
+            'attributes': {
+                'id': editor.option.id + '_area_' + (+(new Date()))
+            }
+        });
+        area.style.cssText = "width:100%;height:100%;display:none;resize:none;";
+        editor.entyArea = area;
+        editor.enty.parentNode.appendChild(area);
+    }
+	
+	if(SinaEditor.env.$IE) {
+		editor.entyArea.style.height = editor.enty.offsetHeight + 'px';
+	}
+    
+    if (!args.customerBtn) {
+        editor.callPlugin({
+            'name': 'showSourceBtn',
+            'args': args
+        });
+    }
+    
+	/**
+	 * 查看源代码。或者把源代码迁移到iframe中
+	 * @param {Boolean} toArea true时为从iframe到textarea
+	 */
+    editor.operation.swapData = function(toArea){
+        var type;
+        var filter = editor.operation.pasteFilter ||
+        function(){
+        };
+        if (toArea) {
+            editor.setState(SinaEditor.STATE.SHOWSOURCE);
+            filter();
+            //if(args.formatter) {
+			
+			if (!SinaEditor.env.$IE >= 9) {
+				//IE6它受不起啊。。。有木有
+				editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
+			} else {
+				editor.entyArea.value = editor.entyBody.innerHTML;
+			}
+			
+            //
+
+            //} else {
+            //	editor.entyArea.value = editor.entyBody.innerHTML;
+            //}
+            //防止flash自动播放
+            editor.entyBody.innerHTML = '';
+        }
+        else {
+            editor.entyBody.innerHTML = (editor.entyArea.value).replace(/\u8203|\t|\n|\r/g, '');
+            filter();
+            editor.setState(SinaEditor.STATE.EDITING);
+        }
+    };
+    
+    return {
+        'initialize': function(){
+            editor.entyArea.style.display = 'none';
+            editor.enty.style.display = '';
+            editor.focus();
+			if(editor.entyArea.value) {
+				editor.operation.swapData(false);
+			}
+            SinaEditor.redoManager.addEditor(editor);
+        }
+    };
+});
+
+
+SinaEditor.plugins.add('showSourceBtn',function(args){
+	var editor = this;
+	//在源代码模式下开启
+	SinaEditor.BUTTON['source'] = function(btn) {
+		switch(this.getState()) {
+			case SinaEditor.STATE.CREATING :
+				btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
+				break;
+			default :
+				btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
+		}
+	};
+
+	var btnConf = {
+		title:'查看源代码',
+        normalClass: 'ico_showsrc_1',
+        disabledClass: 'ico_showsrc_4',
+        clickedClass: 'ico_showsrc_3',
+        mouseoverClass: 'ico_showsrc_2',
+        state: SinaEditor.BUTTONSTATE.DISABLED,
+		editorChangeType:'source',
+        group: 'viewSource'
+    };
+	
+	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
+	
+	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
+	
+	editor.btns.showSource = btn;
+	
+    return {
+        "events": [{
+            "element": btn.$,
             "events": {
-                'editorStateChange': function(){
-                    var state = this.getState();
-                    if (state == SinaEditor.STATE.EDITING) {
-                        exChangeObject(this.entyDoc.getElementsByTagName('object'));
-                        exChangeObject(this.entyDoc.getElementsByTagName('embed'));
-                    } else if (state == SinaEditor.STATE.SHOWSOURCE) {
-                        exChangeObjectBack();
-                    }
+                'click': function(){
+					var state = editor.getState();
+					if(state === SinaEditor.STATE.EDITING) {
+						editor.operation.save(editor);
+						editor.enty.style.display = 'none';
+						editor.entyArea.style.display = '';
+						editor.operation.swapData(true);
+						editor.entyArea.focus();
+					} else if(state === SinaEditor.STATE.SHOWSOURCE) {
+						editor.operation.swapData(false);
+						editor.entyArea.style.display = 'none';
+						editor.enty.style.display = '';
+						editor.focus();
+						editor.operation.save(editor);
+					}
                 }
             }
         }]
+    };
+});
+//重做
+SinaEditor.plugins.add('redoBtn',function(args){
+	var editor = this;
+
+	var btnConf = {
+		title:'重做',
+		normalClass : 'ico_redo_1'
+		,disabledClass : 'ico_redo_4'
+		,clickedClass : 'ico_redo_3'
+		//,mouseoverClass : 'ico_redo_2'
+		,state : SinaEditor.BUTTONSTATE.DISABLED
+		,group : 'redoAndUndo'
+	};
+	
+	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
+	
+	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
+	
+	editor.btns.redo = btn;
+	
+    return {
+        "events": [{
+            "element": editor,
+            "events": {
+                'redoAndUndoChanged': function(){
+                    if(editor._.hasRedo) {
+						btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
+					} else {
+						btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
+					}
+                }
+            }
+        },{
+			'element' : btn.$,
+			'events' : {
+				'click' : function() {
+					if(editor.getState() == SinaEditor.STATE.EDITING) {
+						SinaEditor.redoManager.redo(editor);
+					}
+				},'mouseover' : function() {
+					if(editor._.hasRedo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
+						this.className = 'ico_redo_2';
+					}
+				},'mouseout' : function() {
+					this.className = 'ico_redo_4';
+					if(editor._.hasRedo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
+						this.className = 'ico_redo_1';
+					}
+				}
+			}
+		}]
+    };
+});
+
+//撤销
+SinaEditor.plugins.add('undoBtn',function(args){
+    var editor = this;
+
+	var btnConf = {
+		title:'撤销',
+		normalClass : 'ico_undo_1'
+		,disabledClass : 'ico_undo_4'
+		,clickedClass : 'ico_undo_3'
+		//,mouseoverClass : 'ico_undo_2'
+		,state : SinaEditor.BUTTONSTATE.DISABLED
+		,group : 'redoAndUndo'
+	};
+	
+	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
+	
+	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
+	
+	editor.btns.undo = btn;
+	
+    return {
+        "events": [{
+            "element": editor,
+            "events": {
+                'redoAndUndoChanged': function(){
+                    if(editor._.hasUndo) {
+						btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
+					} else {
+						btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
+					}
+                }
+            }
+        },{
+			'element' : btn.$,
+			'events' : {
+				'click' : function() {
+					if(editor.getState() == SinaEditor.STATE.EDITING) {
+						SinaEditor.redoManager.undo(editor);
+					}
+				},'mouseover' : function() {
+					console.log('112233');
+					if(editor._.hasUndo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
+						this.className = 'ico_undo_2';
+					}
+				},'mouseout' : function() {
+					this.className = 'ico_undo_4';
+					if(editor._.hasUndo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
+						this.className = 'ico_undo_1';
+					}
+				}
+			}
+		}]
     };
 });
 
@@ -8290,188 +6109,208 @@ SinaEditor.plugins.add('redoManager', function(args){
     };
 });
 
-//重做
-SinaEditor.plugins.add('redoBtn',function(args){
+//回车把格式化的方式改为指定的 标签进行处理
+SinaEditor.plugins.add('formatBlock',function(args){
 	var editor = this;
-
-	var btnConf = {
-		title:'重做',
-		normalClass : 'ico_redo_1'
-		,disabledClass : 'ico_redo_4'
-		,clickedClass : 'ico_redo_3'
-		//,mouseoverClass : 'ico_redo_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'redoAndUndo'
-	};
 	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.redo = btn;
-	
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-                'redoAndUndoChanged': function(){
-                    if(editor._.hasRedo) {
-						btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
-					} else {
-						btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
-					}
-                }
-            }
-        },{
-			'element' : btn.$,
-			'events' : {
-				'click' : function() {
-					if(editor.getState() == SinaEditor.STATE.EDITING) {
-						SinaEditor.redoManager.redo(editor);
-					}
-				},'mouseover' : function() {
-					if(editor._.hasRedo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
-						this.className = 'ico_redo_2';
-					}
-				},'mouseout' : function() {
-					this.className = 'ico_redo_4';
-					if(editor._.hasRedo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
-						this.className = 'ico_redo_1';
-					}
-				}
-			}
-		}]
-    };
-});
-
-
-SinaEditor.plugins.add('showSource', function(args){
-    var editor = this;
-    //创建textarea
-    editor.entyArea = args.entyArea;
-    if (!editor.entyArea) {
-        var area = SinaEditor.util.dom.createDom('textarea', {
-            'attributes': {
-                'id': editor.option.id + '_area_' + (+(new Date()))
-            }
-        });
-        area.style.cssText = "width:100%;height:100%;display:none;resize:none;";
-        editor.entyArea = area;
-        editor.enty.parentNode.appendChild(area);
-    }
+	if(SinaEditor.env.$OPERA) {
+		return;
+	}
 	
 	if(SinaEditor.env.$IE) {
-		editor.entyArea.style.height = editor.enty.offsetHeight + 'px';
+		return;
 	}
-    
-    if (!editor.customerBtn) {
-        editor.callPlugin({
-            'name': 'showSourceBtn',
-            'args': args
-        });
-    }
-    
-	/**
-	 * 查看源代码。或者把源代码迁移到iframe中
-	 * @param {Boolean} toArea true时为从iframe到textarea
-	 */
-    editor.operation.swapData = function(toArea){
-        var type;
-        var filter = editor.operation.pasteFilter ||
-        function(){
-        };
-        if (toArea) {
-            editor.setState(SinaEditor.STATE.SHOWSOURCE);
-            filter();
-            //if(args.formatter) {
-			
-			if (!SinaEditor.env.$IE >= 9) {
-				//IE6它受不起啊。。。有木有
-				editor.entyArea.value = SinaEditor.util.styleHTML(editor.entyBody.innerHTML, 1, '\t');
-			} else {
-				editor.entyArea.value = editor.entyBody.innerHTML;
-			}
-			
-            //
 
-            //} else {
-            //	editor.entyArea.value = editor.entyBody.innerHTML;
-            //}
-            //防止flash自动播放
-            editor.entyBody.innerHTML = '';
+	return {
+		'events' : [{
+			"element": editor.entyDoc,
+            "events": {
+				'keydown' : function(e) {
+					var code = e.keyCode || e.which;
+					if (code != 13 || e.shiftKey || e.ctrlKey || e.altKey) {
+						return true;
+					}
+					editor.entyDoc.execCommand('formatblock', false , '<P>');
+					return true;
+				}
+            }
+		}]
+	};
+});
+//添加内容
+SinaEditor.plugins.add('addContent',function(args){
+	var editor = this;
+	
+	/**
+	 * 添加节点
+	 * @param {Element} node 要添加的节点。
+	 * @param {Booelan} focus 是否把焦点集中到新添的节点中
+	 */
+	editor.operation.addNode = function(node,focus){
+		editor.focus();
+		
+		editor.operation.save(editor);
+		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
+		if(!range.collapsed) {
+			range.deleteContents();
+		}
+		var focNode = node;
+		if(node.nodeType === 11) {
+			focNode = node.lastChild;
+		}
+		range.insertNode(node);
+		if(!focus) {
+			_focusAfter(focNode,range);
+		}
+		editor.operation.save(editor);
+	};
+	
+	/**
+	 * 添加文本
+	 * @param {String} str 要添加的字符串
+	 * @param {Booelan} focus 是否把焦点集中到新添的字符串中
+	 */
+	editor.operation.addContent = function(str,focus){
+		editor.focus();
+		
+		editor.operation.save(editor);
+		var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
+		if(!range.collapsed) {
+			range.deleteContents();
+		}
+		var textNode = editor.entyDoc.createTextNode(str);
+		range.insertNode(textNode);
+		if(!focus) {
+			_focusAfter(textNode,range);
+		}
+		editor.operation.save(editor);
+	};
+	
+	var _focusAfter = function(node,range) {
+		range.selectNode(node);
+		range.collapse(false);
+		SinaEditor.range.applyRanges(editor.entyWin,range);
+		editor.focus();
+	};
+});
+/**
+ * 初始化编辑器的方法
+ */
+SinaEditor.plugins.add('initFromStatic',function(args){
+	var editor = this;
+    function init(){
+        editor.entyWin = editor.enty.contentWindow;
+        editor.entyDoc = editor.entyWin.document;
+        editor.entyBody = editor.entyDoc.body;
+        
+        editor.entyBody.spellcheck = !!editor.option.disableNativeSpellChecker;
+        if (SinaEditor.env.$IE) {
+            editor.entyBody.hideFocus = true;
+            editor.entyBody.disabled = true;
+            editor.entyBody.contentEditable = true;
+            editor.entyBody.removeAttribute('disabled');
         }
         else {
-            editor.entyBody.innerHTML = (editor.entyArea.value).replace(/\u200B|\t|\n|\r/g, '');
-            filter();
-            editor.setState(SinaEditor.STATE.EDITING);
-        }
-    };
-    
-    return {
-        'initialize': function(){
-            editor.entyArea.style.display = 'none';
-            editor.enty.style.display = '';
-            editor.focus();
-            SinaEditor.redoManager.addEditor(editor);
-        }
-    };
-});
-
-
-SinaEditor.plugins.add('showSourceBtn',function(args){
-	var editor = this;
-	//在源代码模式下开启
-	SinaEditor.BUTTON['source'] = function(btn) {
-		switch(this.getState()) {
-			case SinaEditor.STATE.CREATING :
-				btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
-				break;
-			default :
-				btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
-		}
-	};
-
-	var btnConf = {
-		title:'查看源代码',
-        normalClass: 'ico_showsrc_1',
-        disabledClass: 'ico_showsrc_4',
-        clickedClass: 'ico_showsrc_3',
-        mouseoverClass: 'ico_showsrc_2',
-        state: SinaEditor.BUTTONSTATE.DISABLED,
-		editorChangeType:'source',
-        group: 'common'
-    };
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.showSource = btn;
-	
-    return {
-        "events": [{
-            "element": btn.$,
-            "events": {
-                'click': function(){
-					var state = editor.getState();
-					if(state === SinaEditor.STATE.EDITING) {
-						editor.operation.save(editor);
-						editor.enty.style.display = 'none';
-						editor.entyArea.style.display = '';
-						editor.operation.swapData(true);
-						editor.entyArea.focus();
-					} else if(state === SinaEditor.STATE.SHOWSOURCE) {
-						editor.operation.swapData(false);
-						editor.entyArea.style.display = 'none';
-						editor.enty.style.display = '';
-						editor.focus();
-						editor.operation.save(editor);
-					}
+            setTimeout(function(){
+                if (SinaEditor.env.$GENKO) {
+					//editor.entyDoc.designMode = 'on';
+                    editor.entyBody.contentEditable = true;
+                    var fFocus = false;
+                    //修正在FF下，iframe样式修改造成的不能再编辑问题。
+                    SinaEditor.ev.add(editor.enty, 'DOMAttrModified', function(e){
+                        var an = e.attrName.toUpperCase();
+                        if (an == 'CLASS' || an == 'STYLE') {
+                            editor.entyBody.contentEditable = false;
+                            editor.entyBody.contentEditable = true;
+                            editor.entyWin.blur();
+                            editor.entyWin.focus();
+                        }
+                    });
                 }
+                else 
+                    if (SinaEditor.env.$WEBKIT) {
+                        editor.entyBody.parentNode.contentEditable = true;
+                    }
+                    else {
+                        editor.entyDoc.designMode = 'on';
+                    }
+            }, 0);
+        }
+        
+        setTimeout(function(){
+            try {
+                editor.entyDoc.execCommand('enableObjectResizing', false, !editor.option.disableObjectResizing);
+            } 
+            catch (e) {
             }
-        }]
-    };
+            try {
+                editor.entyDoc.execCommand('enableInlineTableEditing', false, !editor.option.disableNativeTableHandles);
+            } 
+            catch (e) {
+            }
+			
+            if (SinaEditor.env.$IE <= 6) {
+				try{
+					//图标被重复的请求
+					document.execCommand("BackgroundImageCache", false, true);
+				}catch(e){}
+                setTimeout(function(){
+                    var doc = editor.entyDoc;
+                    if (doc) {
+                        var $body = doc.body;
+                        $body.runtimeStyle.marginBottom = '0px';
+                        $body.runtimeStyle.marginBottom = '';
+                    }
+                }, 1000);
+            }
+        }, 0);
+		
+		if(SinaEditor.env.$IE) {
+			var sc = SinaEditor.util.dom.createDom('script', {
+	            'ownerDocument': editor.entyDoc,
+	            'attributes': {
+					'type':'text/javascript',
+	                'src':'http://sjs.sinajs.cn/xblog/ierange-m2.js?'+SinaEditor.version
+	            }
+	        });
+			
+			editor.entyDoc.getElementsByTagName('head')[0].appendChild(sc);
+		}
+        
+        if (editor.option.styleLinks) {
+            var links = editor.option.styleLinks;
+			var i;
+            for (i = 0; links[i]; i++) {
+                SinaEditor.util.dom.addLink(links[i], editor.entyDoc);
+            }
+        }
+		
+        if (editor.option.styles) {
+            SinaEditor.util.dom.addStyles(editor.option.styles, editor.entyDoc);
+        }
+    }
+    
+	var customDomain = document.domain;
+
+    var func = 'document.open();' +
+			    (SinaEditor.env.isCustomDomain ? 'document.domain="' + customDomain + '";' : '') +
+			    'document.close();';
+    
+    var iframe = SinaEditor.util.dom.createDomFromHTML('<iframe' +
+			    ' style="width:100%;height:100%;z-index:999;"' +
+			    ' frameBorder="0"' +
+			    ' src="' +
+			    (SinaEditor.env.$IE ? 'javascript:void(function(){' + encodeURIComponent(func) + '}())' : '') +
+			    '"' +
+			    ' allowTransparency="true"' +
+			    '></iframe>');
+    editor.enty = iframe;
+    SinaEditor.ev.add(iframe, 'load', init);
+	setTimeout(function(){
+		args.parent.appendChild(iframe);
+	},0);
 });
+
 //获取最终编辑的内容
 SinaEditor.plugins.add('submit',function(args){
 	var editor = this;
@@ -8485,340 +6324,545 @@ SinaEditor.plugins.add('submit',function(args){
 			filter = editor.operation.pasteFilter || function(){};
 			swapData = editor.operation.swapData || function(){};
 		swapData(true);
+		if(SinaEditor.env.$IE) {
+			var tmpDiv = document.createElement('div');
+			var before = editor.entyArea.value;
+			tmpDiv.innerHTML = editor.entyArea.value;
+			trace('~~~~~~~~~~~~~~~~~~~~'+(before === editor.entyArea.value));
+			editor.entyArea.value = tmpDiv.innerHTML;
+		}
 		str = editor.entyArea.value;
 		swapData(false);
 		return str;
 	};
 });
-//插入表格
-SinaEditor.plugins.add('tableUI',function(args){
+//通过textarea的代码提交进行的转换。
+SinaEditor.plugins.add('qingMobileSubmit',function(args){
 	var editor = this;
 	
-	if (!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'tableUIBtn',
-			'args' : args
-		});
-	}
-	
-	if (!args.customerPanel) {
-		editor.callPlugin({
-			'name' : 'tableUIPanel',
-			'args' : args
-		});
-	}
-	
 	/**
-	 * 添加表格
-	 * @param {Interget} x 行数
-	 * @param {Object} y 列数
-	 * @param {Object} option 可选参数，目前没有用到
+	 * 获取最终编辑的内容
+	 * @return {String} 最终的html字符串
 	 */
-	editor.operation.tableCreate = function(x,y,option){
+	editor.operation.submit = function(){
+		return editor.entyArea.value;
+	};
+});
+//插入链接
+SinaEditor.plugins.add('link',function(args){
+    var editor = this;
+    var btn = null;
+    
+    if (!args.customerPanel) {
+       editor.callPlugin({
+			'name' : 'qingLinkPanel',
+			'args' : args
+		});
+    }
+	
+	if (!args.customerBtn) {
+       editor.callPlugin({
+			'name' : 'linkBtn',
+			'args' : args
+		});
+    }
+    
+    /**
+     * 添加链接，根据参数传递的情况决定如何操作
+     * 1.有选中文字：首先会清理掉里面所有的A标签
+     * 	a.不传递：检测选区中的a标签，全部清除。
+     * 	b.传递link：选区包裹上以A标签作为链接。
+     * 	c.传递link,str：忽略str,同操作1b。
+     * 2.没有选中文字：
+     * 	a.不传递：不做任何操作。
+     * 	b.传递link:以link作为str来生成链接
+     * 	c.传递link,str:添加链接。
+     * @param {Object} opt_obj 包含多种可选参数：
+     * 	link 链接
+     * 	str 文字
+     * 	range 当前的选区
+     * 	elm 传递的节点，一定是A标签，如果包含有link，那么则替换elm的地址，没有，那么删除A标签的地址
+     */
+    editor.operation.link = function(optObj){
+		editor.focus();
+        var range = optObj.range || SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
+		var link = optObj.link;
+		var str = optObj.str || link;
 		
-		if(x<=0 || y<=0) {
-			return;
-		}
-		
+        if (!link && !range) {
+            //2a.不传递：不做任何操作。
+			console.log("2a.不传递：不做任何操作。");
+            return;
+        }
+        
         editor.operation.save(editor);
 		
-		var tabHTMLs = ['<table cellspacing="1" cellpadding="3" style="width:80%;text-align:center;" border="1" >'];
-		var i,j;
-		for(i=0; i<y; i++) {
-			tabHTMLs.push('<tr>');
-			for (j = 0; j < x; j++) {
-				tabHTMLs.push('<td>&nbsp;</td>');
+		if(optObj.elm) {
+			var elm = optObj.elm;
+			if(optObj.link) {
+				elm.href = encodeURI(optObj.link);
+				range.selectNodeContents(elm);
+				SinaEditor.range.applyRanges(editor.entyWin, range);
+			} else {
+				SinaEditor.util.dom.removeTag(elm);
 			}
-			tabHTMLs.push('</tr>');
+		} else {
+			var a = SinaEditor.util.dom.createDom('a', {
+				ownerDocument: editor.entyDoc,
+	            properties: {
+	                'target': '_blank'
+	            }
+	        }),
+				zeroBlank = editor.entyDoc.createDocumentFragment(),
+				tmp = editor.entyDoc.createElement('div');
+			tmp.innerHTML = SinaEditor.env.$IE ? '&nbsp;' : '&#8203;';
+			//zeroBlank.appendChild(tmp.firstChild);
+			zeroBlank = tmp.firstChild;
+			link = link.indexOf('://') === -1 ? 'http://'+link : link;
+
+			try {
+				a.href = encodeURI(link);
+				if(window._linkElm) {
+					if(window._linkElm.parentNode && window._linkElm.parentNode.href) {
+						window._linkElm.parentNode.href = a.href;
+						return;
+					}
+					window._linkElm.parentNode.insertBefore(a,window._linkElm);
+					a.appendChild(window._linkElm);
+					window._linkElm = null;
+					editor.focus();
+					return;
+				}
+			} catch(e){trace(e)}
+
+	        if (!range || range && range.collapsed) {
+	            //2b,c.添加链接。 
+				a.innerHTML = str;
+				a.href = encodeURI(link);
+	            //range ? range.insertNode(a) : editor.entyBody.appendChild(a);
+				if(range) {
+					range.insertNode(a);
+					if (!SinaEditor.env.$IE) {
+						SinaEditor.util.dom.insertAfter(zeroBlank,a);
+						range.selectNodeContents(zeroBlank);
+						range.collapse(false);
+						editor.focus();
+					} else {
+						range.selectNodeContents(a);
+					}
+				} else {
+					editor.entyBody.appendChild(a);
+					range.selectNodeContents(a);
+				}
+				SinaEditor.range.applyRanges(editor.entyWin, range);
+	        } else {
+				//1a：检测选区中的a标签，全部清除。
+//				SinaEditor.range.removeStyle(editor, {
+//	                'useTagName': 'a'
+//	            });
+				editor.entyDoc.execCommand('unlink',false,'');
+				
+		        if(link) {
+					//1bc:选区包裹上以A标签作为链接。
+					a.href = encodeURI(link);
+					//#BLOGBUG-12256
+					//之前的操作破坏了选区，需要重新获取(有些浏览器的currentRange不是同一个引用)
+					range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
+					try {
+						if (SinaEditor.env.$IE) {
+							editor.entyDoc.execCommand('link',false,encodeURI(link));
+						} else {
+							//在跨节点时会报错
+							range.surroundContents(a);
+						}
+					} catch(e) {
+						var content = range.extractContents();
+						a.appendChild(content);
+						range.insertNode(a);
+					}
+					try {
+						if(SinaEditor.env.$IE) {
+							if(a.childNodes[0].tagName.toUpperCase() === 'P') {
+								SinaEditor.util.dom.insertAfter(zeroBlank,a);
+								range.selectNodeContents(zeroBlank);
+								range.collapse(false);
+							}
+						} else {
+							SinaEditor.util.dom.insertAfter(zeroBlank,a);
+							range.selectNodeContents(zeroBlank);
+							range.collapse(false);
+						}
+					} catch(e){}
+					//range.selectNodeContents(a);
+					editor.focus();
+					SinaEditor.range.applyRanges(editor.entyWin, range);
+					//#BLOGBUG-12345 转中文不给力啊。
+					//editor.entyDoc.execCommand('createLink',false,encodeURIComponent(link));
+				}
+	        }
 		}
-		tabHTMLs.push('</table>');
-		var table = SinaEditor.util.dom.createDomFromHTML(tabHTMLs.join(''),editor.entyDoc);
-		editor.operation.addNode(table);
         
         editor.operation.save(editor);
     };
 });
-//插入表格
-SinaEditor.plugins.add('tableUIBtn',function(args){
-	var editor = this;
+
+//插入链接的按钮
+SinaEditor.plugins.add('linkBtn',function(args){
+    var editor = this;
+	var linkPanel = editor.panels.link;
+	var hidden = linkPanel.nodes.hidden;
 	
 	var btnConf = {
-		title:'插入表格',
-		normalClass : 'ico_table_1'
-		,disabledClass : 'ico_table_4'
-		,clickedClass : 'ico_table_3'
-		,mouseoverClass : 'ico_table_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'richdata'
-	};
+		title:'插入链接',
+        normalClass: 'func_addlink',
+        disabledClass: 'func_addlink_dis',
+        clickedClass: 'func_addlink_act',
+        mouseoverClass: 'func_addlink_hover',
+        state: SinaEditor.BUTTONSTATE.DISABLED,
+        group: 'la'
+    };
 	
 	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
 	
 	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
 	
-	editor.btns.tableUI	= btn;
-	editor.btns.tableUI.PANELX = 0;
-	editor.btns.tableUI.PANELY = 0;
+	editor.btns.link = btn;
 	
-    return {
-        "events": [{
+	return {
+		"events": [{
             "element": btn.$,
             "events": {
                 'click' : function() {
-					if(btn.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
+					if(editor.btns.link.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
 						return false;
 					}
-					var panel = editor.panels.tableUI;
-					var scroll = SinaEditor.util.dom.getScrollPos();
-					var pos = SinaEditor.util.dom.getXY(btn.$);
-					panel.setPosition({x:pos[0],y:(pos[1]+btn.$.offsetHeight)});
-					panel.nodes.chooseContent.style.width = '0em';
-					panel.nodes.chooseContent.style.height = '0em';
-					panel.show();
-					var palPos = SinaEditor.util.dom.getXY(panel.nodes.panel);
-					editor.btns.tableUI.PANELX = palPos[0];
-					editor.btns.tableUI.PANELY = palPos[1];
-					return false;
-				}
-            }
-        }]
-    };
-});
-//插入表格
-SinaEditor.plugins.add('tableUIPanel',function(args){
-	var editor = this;
-	var btn = null;
-	
-	var colors = args.colors || SinaEditor.TOOLCONF.COLOR;
-	var tablePanel = new SinaEditor._.Panel();
-	tablePanel.setTemplate(SinaEditor.TOOLCONF.tableTemplate);
-	
-	var panel = tablePanel.nodes.panel;
-	var eventContent = tablePanel.nodes.eventContent;
-	var baseContent = tablePanel.nodes.baseContent;
-	var chooseContent = tablePanel.nodes.chooseContent;
-	var tabNums = tablePanel.nodes.tabNums;
-	
-	editor.panels.tableUI = tablePanel;
-	
-	return {
-        "events": [{
-            "element": eventContent,
-            "events": {
-                'mousemove' : function(e) {
-					var btn = editor.btns.tableUI;
-					var scroll = SinaEditor.util.dom.getScrollPos();
-					var xLoc = parseInt((e.clientX-btn.PANELX+scroll[1])/16,10) || 1;
-					var yLoc = parseInt((e.clientY-btn.PANELY+scroll[0])/16,10) || 1;
-					
-					xLoc = xLoc > 20 ? 20 : xLoc;
-					yLoc = yLoc > 20 ? 20 : yLoc;
-					
-					chooseContent.style.width = xLoc + 'em';
-					chooseContent.style.height = yLoc + 'em';
-					
-					var tmpWidth = (xLoc < 5 ? 5 : xLoc) + 'em';
-					baseContent.style.width = tmpWidth;
-					baseContent.style.height = (yLoc < 5 ? 5 : yLoc) + 'em';
-					eventContent.style.width = tmpWidth;
-					tabNums.innerHTML = [xLoc,' * '+yLoc].join('');
-				}
-            }
-        },{
-            "element": document,
-            "events": {
-                'click' : function(e) {
-					var target = e.target;
-					if(SinaEditor.util.dom.containsNode(editor.btns.tableUI.$,target)) {
-						return;
-					}
-					if(!SinaEditor.util.dom.containsNode(panel,target)) {
-						tablePanel.hidden();
-					}
-				}
-            }
-        },{
-            "element": chooseContent,
-            "events": {
-                'click' : function(e) {
-					var matrix = tabNums.innerHTML;
-					var arr = matrix.split('*');
-					editor.operation.tableCreate(parseInt(arr[0],10),parseInt(arr[1],10));
-					tablePanel.hidden();
-				}
-            }
-        },{
-            "element": editor,
-            "events": {
-                'editorSelectionChange' : function(){
-					tablePanel.hidden();
-				}
-            }
-        }]
-    };
-});
-//用于加粗
-//通过添加strong标签和移除strong标签来达到
-SinaEditor.plugins.add('underline',function(args){
-	var editor = this;
-	
-	if(!args.customerBtn) {
-		editor.callPlugin({
-			'name' : 'underlineBtn',
-			'args' : args
-		});
-	}
-	
-	var btn = editor.btns.underline;
-	
-	/**
-	 * 加粗，isAdd可能是参照节点，也可能是一个boolean值
-	 * @param {Object} isAdd
-	 */
-	editor.operation.underline = function(refNode){
-		
-		var ranges = SinaEditor.range.getCurrentRanges(editor.entyWin);
-		//TODO 和IE统一，暂时只支持第一个选区
-		ranges = ranges[0];
-		if(!ranges) {
-			return;
-		}
-        editor.operation.save(editor);
-		
-		//var isUnderline = editor.operateState['underline'];
-		var isUnderline = editor.operateState.underline;
-		
-		if(isUnderline) {
-			console.log('执行去下划线操作');
-			SinaEditor.range.removeStyle(editor, {
-	            'useTagName': 'span',
-	            'style': 'textDecoration'
-	        });
-			btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
-		} else {
-			console.log('执行加下划线操作');
-			SinaEditor.range.applyStyle(editor, {
-	            'useTagName': 'span',
-	            'style': 'textDecoration',
-	            'value': 'underline'
-	        });
-			btn.setState(SinaEditor.BUTTONSTATE.CLICKED);
-		}
-        
-		//editor.operateState['underline'] = !isUnderline;
-		editor.operateState.underline = !isUnderline;
-        editor.operation.save(editor);
-    };
-	
-	
-    return {
-        "events": [{
-            "element": editor,
-            "events": {
-				'editorSelectionChange' : function(e,range,refNode) {
-					var isUnderline = SinaEditor.range.queryCommandState(this.entyDoc,'underline');
-					
-					if(isUnderline) {
-						btn.setState(SinaEditor.BUTTONSTATE.CLICKED);
+					var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
+					var str = range.toString();
+					if(SinaEditor.TOOLCONF.addLinkNow && SinaEditor.TOOLCONF.addLinkNow.test(str)) {
+						editor.operation.link({'link':str,'range':range});
 					} else {
-						btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
+//						var start = range.startContainer;
+//						//要选中A
+//						if(start)
+//						
+//						
+//						linkNode.value = decodeURI(node.href);
+//		_tmpNode = node;
+//		linkPanel.show();
+//						
+//						if() {
+//							editor.panels.link.nodes.linkNode.value = decodeURI(node.href);
+//						}
+						
+						if(range.collapsed) {
+							hidden.style.display = '';
+						}
+						linkPanel.show();
 					}
-					
-					//this.operateState['underline'] = isUnderline;
-					this.operateState.underline = isUnderline;
-				}
-				,'ctrlu' : function() {
-					editor.operation.isUnderline(this);
+                    return false;
 				}
             }
         }]
-    };
-});
-//下划线
-//通过添加strong标签和移除strong标签来达到
-SinaEditor.plugins.add('underlineBtn',function(args){
-	var editor = this;
-
-	var btnConf = {
-		title:'下划线',
-		normalClass : 'ico_underline_1'
-		,disabledClass : 'ico_underline_4'
-		,clickedClass : 'ico_underline_3'
-		,mouseoverClass : 'ico_underline_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'common'
 	};
-	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
-	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
-	
-	editor.btns.underline = btn;
-
-    return {
-        "events": [{
-			'element' : btn.$,
-			'events' : {
-				'click' : function() {
-					editor.operation.underline(editor);
-				}
-			}
-		}]
-    };
 });
-//撤销
-SinaEditor.plugins.add('undoBtn',function(args){
+
+//插入链接的弹出浮层
+SinaEditor.plugins.add('linkPanel',function(args){
     var editor = this;
-
-	var btnConf = {
-		title:'撤销',
-		normalClass : 'ico_undo_1'
-		,disabledClass : 'ico_undo_4'
-		,clickedClass : 'ico_undo_3'
-		//,mouseoverClass : 'ico_undo_2'
-		,state : SinaEditor.BUTTONSTATE.DISABLED
-		,group : 'redoAndUndo'
+	
+    var linkPanel = SinaEditor.winDialog.create({
+        title: '添加链接',
+		//老的一去不复返了
+        //content: SinaEditor.TOOLCONF.linkTemplate,
+		funcClose:function(){
+			_back();
+		}
+    });
+	
+    linkPanel.setMiddle();
+    linkPanel.setFixed(true);
+    
+    var okNode = linkPanel.nodes.ok;
+    var cancelNode = linkPanel.nodes.cancel;
+    var textNode = linkPanel.nodes.text;
+	var hiddNode = linkPanel.nodes.hidden;
+    var linkNode = linkPanel.nodes.link;
+	var _tmpNode;
+    
+	var _back = function() {
+		hiddNode.style.display = 'none';
+		_tmpNode = null;
+        textNode.value = '';
+		linkNode.value = '';
 	};
 	
-	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
+	editor.panels.link = linkPanel;
 	
-	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
+	//link浮层的代码
+    SinaEditor.CONF.aBubbleModify = function(node) {
+		linkNode.value = decodeURI(node.href);
+		_tmpNode = node;
+		linkPanel.show();
+	};
 	
-	editor.btns.undo = btn;
+	SinaEditor.CONF.aBubbleDelete = function(node) {
+		editor.operation.link({'elm':node});
+	};
 	
     return {
         "events": [{
-            "element": editor,
+            "element": okNode,
             "events": {
-                'redoAndUndoChanged': function(){
-                    if(editor._.hasUndo) {
-						btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
-					} else {
-						btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
-					}
+                'click': function(){
+					editor.operation.link({
+						'link' : linkNode.value,
+						'str' : textNode.value,
+						'elm' : _tmpNode
+					});
+					_back();
+					linkPanel.hidden();
                 }
             }
         },{
-			'element' : btn.$,
-			'events' : {
-				'click' : function() {
-					if(editor.getState() == SinaEditor.STATE.EDITING) {
-						SinaEditor.redoManager.undo(editor);
+            "element": cancelNode,
+            "events": {
+                'click': function(){
+                    _back();
+        			linkPanel.hidden();
+                }
+            }
+        }]
+    };
+});
+
+//插入链接的弹出浮层，专为轻博客重写的编辑器
+SinaEditor.plugins.add('qingLinkPanel',function(args){
+    var editor = this;
+	
+    var linkPanel = SinaEditor.winDialog.create({
+        title: '添加链接',
+        content: SinaEditor.TOOLCONF.qingLinkTemplate,
+		funcClose:function(){
+			_back();
+		}
+    });
+	
+    linkPanel.setMiddle();
+    linkPanel.setFixed(true);
+    linkPanel.nodes.content.className = 'editLink';
+    var okNode = linkPanel.nodes.ok;
+    var cancelNode = linkPanel.nodes.cancel;
+    var textNode = linkPanel.nodes.text;
+	var hiddNode = linkPanel.nodes.hidden;
+    var linkNode = linkPanel.nodes.link;
+	var _tmpNode;
+    
+	var _back = function() {
+		hiddNode.style.display = 'none';
+		_tmpNode = null;
+        textNode.value = '';
+		linkNode.value = '';
+	};
+	
+	editor.panels.link = linkPanel;
+	
+	//link浮层的代码
+    SinaEditor.CONF.aBubbleModify = function(node) {
+		linkNode.value = decodeURI(node.href);
+		_tmpNode = node;
+		linkPanel.show();
+	};
+	
+	SinaEditor.CONF.aBubbleDelete = function(node) {
+		editor.operation.link({'elm':node});
+	};
+	
+    return {
+        "events": [{
+            "element": okNode,
+            "events": {
+                'click': function(){
+					if(SinaEditor.util.trim(linkNode.value)) {
+						editor.operation.link({
+							'link' : linkNode.value,
+							'str' : textNode.value,
+							'elm' : _tmpNode
+						});
 					}
-				},'mouseover' : function() {
-					console.log('112233');
-					if(editor._.hasUndo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
-						this.className = 'ico_undo_2';
-					}
-				},'mouseout' : function() {
-					this.className = 'ico_undo_4';
-					if(editor._.hasUndo && btn.getState() === SinaEditor.BUTTONSTATE.NORMAL) {
-						this.className = 'ico_undo_1';
+					_back();
+					linkPanel.hidden();
+                }
+            }
+        },{
+            "element": cancelNode,
+            "events": {
+                'click': function(){
+                    _back();
+        			linkPanel.hidden();
+                }
+            }
+        },{
+			"element": linkNode,
+            "events": {
+                'focus': function(){
+					this.className = 'focus';
+                },
+				'blur': function(){
+					this.className = '';
+                },
+				'keydown':function(e){
+					var which = e.which || e.keyCode || e.charCode;
+					if(which === 13) {
+						if(hiddNode.style.display !== '') {
+							SinaEditor.ev.stopEvent(e);
+							SinaEditor.ev.fire(okNode,'click');
+							return false;
+						} else {
+							textNode.focus();
+						}
 					}
 				}
-			}
+            }
+		},{
+			"element": textNode,
+            "events": {
+                'focus': function(){
+					this.className = 'focus';
+                },
+				'blur': function(){
+					this.className = '';
+                },
+				'keydown':function(e){
+					var which = e.which || e.keyCode || e.charCode;
+					if(which === 13) {
+						SinaEditor.ev.stopEvent(e);
+						SinaEditor.ev.fire(okNode,'click');
+						return false;
+					}
+				}
+            }
 		}]
     };
+});
+
+//插入链接的按钮
+SinaEditor.plugins.add('qingLinkRemoveBtn',function(args){
+    var editor = this;
+	
+	var btnConf = {
+		title:'删除链接',
+        normalClass: 'func_removelink',
+        disabledClass: 'func_removelink_dis',
+        clickedClass: 'func_removelink_act',
+        mouseoverClass: 'func_removelink_hover',
+        state: SinaEditor.BUTTONSTATE.DISABLED,
+        group: 'lr'
+    };
+	
+	btnConf = SinaEditor.util.mix(btnConf,args.btnConf);
+	
+	var btn = SinaEditor.ButtonFactory.createButton(btnConf,editor);
+	
+	editor.btns.qingLinkRemove = btn;
+	
+	var getChilds = function(node) {
+		var nodes = node.childNodes,
+			nodesArr = [],
+			i=0;
+		for(;nodes[i]; i++) {
+			if(nodes[i].nodeType === SinaEditor.NODETYPE.ELEMENT) {
+				nodesArr[nodesArr.length] = nodes[i];
+			}
+		}
+		return nodesArr;
+	};
+	
+	var clearElementA = function(container,doOper) {
+		var childNodes = getChilds(container),
+			i=0;
+		for(;childNodes[i];i++) {
+			if(childNodes[i].tagName.toUpperCase() === 'A') {
+				if (doOper) {
+					editor.operation.link({
+						'elm': childNodes[i]
+					});
+				}
+				return false;
+			}
+			clearElementA(childNodes[i],doOper);
+		}
+		return true;
+	};
+	
+	return {
+		"events": [{
+            "element": btn.$,
+            "events": {
+                'click' : function() {
+					if(editor.btns.qingLinkRemove.getState() === SinaEditor.BUTTONSTATE.DISABLED) {
+						return false;
+					}
+					if(SinaEditor.env.$IE) {
+						editor.operation.save(editor);
+						editor.entyDoc.execCommand('unlink',false,'');
+						editor.operation.save(editor);
+						return false;
+					} else {
+						var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0],
+							node = range.commonAncestorContainer,
+							startContainer = range.startContainer,
+							endContainer = range.endContainer;
+						node = node.nodeType === SinaEditor.NODETYPE.TEXT ? node.parentNode : node;
+						if (node && node.tagName) {
+							if(node.tagName.toUpperCase() === 'A') {
+								editor.operation.link({'elm':node});
+								return false;
+							}
+							clearElementA(node,true);
+							//node = node.parentNode;
+						}
+	                    return false;
+					}
+				}
+            }
+        },{
+            "element": editor,
+            "events": {
+				'editorOnladed' : function(){
+					btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
+				},
+				'editorSelectionChange' : function() {
+					var range = SinaEditor.range.getCurrentRanges(editor.entyWin)[0];
+					if(range.collapsed) {
+						btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
+						return;
+					}
+					
+					btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
+					return;
+					
+						var	node = range.commonAncestorContainer;
+						console.log(node);
+						node = node.nodeType === SinaEditor.NODETYPE.TEXT ? node.parentNode : node;
+						if (node && node.tagName) {
+							if(node.tagName.toUpperCase() === 'A') {
+								btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
+								return;
+							}
+							if(node.childNodes.length !== 1) {
+								btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
+								return;
+							}
+							if(!clearElementA(node,false)) {
+								btn.setState(SinaEditor.BUTTONSTATE.NORMAL);
+								return;
+							}
+						}
+						btn.setState(SinaEditor.BUTTONSTATE.DISABLED);
+				}
+            }
+        }]
+	};
 });
 
 if(!SinaEditor.$abstract) {
@@ -8923,22 +6967,6 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 	//已有插件列表
 	this._jobTableIndex = {};
 	/**
-	 * 实体对象，即编辑器的iframe节点。
-	 */
-	this.enty = null;
-	/**
-	 * iframe的window对象引用。
-	 */
-	this.entyWin = null;
-	/**
-	 * iframe的document对象引用。
-	 */
-	this.entyDoc = null;
-	/**
-	 * iframe的body节点引用。
-	 */
-	this.entyBody = null;
-	/**
 	 * 编辑器的textarea节点引用。
 	 */
 	this.entyArea = null;
@@ -9018,35 +7046,45 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 			i++;
             if (i >= joblen) {
                 clearInterval(interNum);
-                interNum = null;
+				interNum = null;
+				if(joblen === 0) {
+					_this._initCustomEvent();
+					_this.setState(SinaEditor.STATE.CREATED);
+					_this.setState(SinaEditor.STATE.EDITING);
+				}
                 SinaEditor.ev.fire(_this, 'editorOnladed');
                 return;
             }
 			if(_this.entyWin) {
-				
-				if(!_this.hasAddEvent) {
-					_this.hasAddEvent = true;
-					var ev = null;
-					//这里来初始化事件
-					for(ev in SinaEditor.ev.customEvent) {
-						if(_this.option.eventBlackList.indexOf(ev) < 0) {
-							SinaEditor.ev.$regEvent(ev,_this);
-						} else {
-							console.log(_this.option.id+'在黑名单中：'+ev);
-						}
-					}
-				}
+				_this._initCustomEvent();
 				
 				_this.callPlugin(jobs[i]);
 				
 				_this.setState(SinaEditor.STATE.CREATED);
 				_this.setState(SinaEditor.STATE.EDITING);
+				
 			} else {
 				console.log("等一下");
 				i--;
 			}
         }, 10);
-    },
+    }
+	
+	,_initCustomEvent : function(){
+		if(!this.hasAddEvent) {
+			this.hasAddEvent = true;
+			var ev = null;
+			//这里来初始化事件
+			for(ev in SinaEditor.ev.customEvent) {
+				if(this.option.eventBlackList.indexOf(ev) < 0) {
+					SinaEditor.ev.$regEvent(ev,this);
+				} else {
+					console.log(this.option.id+'在黑名单中：'+ev);
+				}
+			}
+		}
+	}
+	
     /**
      * 单独后执行某个插件。
      * @memberOf SinaEditor.$abstract.baseEditor#
@@ -9069,7 +7107,11 @@ SinaEditor.$abstract.baseEditor = function(oOption){
 	 * 	</tr>
      * </table>
      */
-    callPlugin: function(pluginConf){
+    ,callPlugin: function(pluginConf){
+		if(!pluginConf) {
+			return;
+		}
+		console.log("callPlugin:"+pluginConf.name);
 		var getTime = function(){
             return new Date().valueOf();
         };
@@ -9133,13 +7175,6 @@ SinaEditor.$abstract.baseEditor = function(oOption){
         }
     }
 	/**
-     * 焦点集中到编辑器中。
-     * @memberOf SinaEditor.$abstract.baseEditor#
-     */
-	,focus : function() {
-		this.entyWin.focus();
-	}
-	/**
      * 设置编辑器的状态。设置后，会触发自定义事件editorStateChange。
      * @memberOf SinaEditor.$abstract.baseEditor#
      * @param state {int} 要设置的编辑器的状态可以设置：<br>
@@ -9174,8 +7209,10 @@ SinaEditor.createEditor = function(conf){
     //    job.add(conf['filter']);
     //}
 	var job = new (eval('(' + conf.editorName + ')'))(conf);
-	var pName = conf.plugns,i;
-	job.add(conf.initType);
+	var pName = conf.plugns || [],i;
+	if(conf.initType) {
+		job.add(conf.initType);
+	}
 	if (conf.filter) {
         job.add(conf.filter);
     }
@@ -9192,14 +7229,65 @@ SinaEditor._ = {};if(!SinaEditor._) {
 	SinaEditor._ = {};
 }
 
-SinaEditor._.entyimpl = {};
+if(!SinaEditor._.entyimpl) {
+	SinaEditor._.entyimpl = {};
+}
 
 /**
  * 通常的编辑器类，继承自{@link SinaEditor.$abstract.baseEditor}
  * @class 通常用的编辑器
  */
 SinaEditor._.entyimpl.normalEditor = function(){
-}.$extends(SinaEditor.$abstract.baseEditor).$define({});/**
+	/**
+	 * 实体对象，即编辑器的iframe节点。
+	 */
+	this.enty = null;
+	/**
+	 * iframe的window对象引用。
+	 */
+	this.entyWin = null;
+	/**
+	 * iframe的document对象引用。
+	 */
+	this.entyDoc = null;
+	/**
+	 * iframe的body节点引用。
+	 */
+	this.entyBody = null;
+}.$extends(SinaEditor.$abstract.baseEditor).$define({
+	/**
+     * 焦点集中到编辑器中。
+     * @memberOf SinaEditor.$abstract.baseEditor#
+     */
+	focus : function() {
+		this.entyWin.focus();
+	}
+});if(!SinaEditor._) {
+	SinaEditor._ = {};
+}
+
+if(!SinaEditor._.entyimpl) {
+	SinaEditor._.entyimpl = {};
+}
+
+/**
+ * 针对移动设备的编辑器，继承自{@link SinaEditor.$abstract.baseEditor}
+ * @class 通常用的编辑器
+ */
+SinaEditor._.entyimpl.textAreaEditor = function(){
+	/**
+	 * 用于初始化一些函数
+	 */
+	this.entyWin = true;
+}.$extends(SinaEditor.$abstract.baseEditor).$define({
+	/**
+     * 焦点集中到编辑器中。
+     * @memberOf SinaEditor.$abstract.baseEditor#
+     */
+	focus : function() {
+		this.entyArea.focus();
+	}
+});/**
  * IRenderer,呈现器接口,实现对象的呈现方式
  * @class IRenderer,呈现器接口,实现对象的呈现方式
  * @author Random | YangHao@staff.sina.com.cn
@@ -12213,7 +10301,7 @@ SinaEditor.winDialog={};
 		].join(""),
 				
 				
-		customs:[
+		customs1:[
 			'<table id="#{panel}" class="CP_w">',
 				'<thead id="#{titleBar}">',
 					'<tr>',
@@ -12243,6 +10331,20 @@ SinaEditor.winDialog={};
 					'</tr>',
 				'</tbody>',
 			'</table>'
+		].join(""),
+		
+		customs:[
+			'<div class="pops" id="#{panel}">',
+				'<div class="hd"></div>',
+				'<div class="bd">',
+					'<div class="tit" id="#{titleBar}"><span id="#{titleName}">提示标题</span></div>',
+					'<div class="con elink"><a href="#" id="#{btnClose}" onclick="return false;" title="关闭" class="close">关闭</a>',
+						'<div id="#{content}"></div>',
+						'<div class="submit"> <a onclick="return false" id="#{ok}" href="#" class="btn"><span>确定</span></a> <a onclick="return false" id="#{cancel}" href="#" class="btn"><span>取消</span></a> </div>',
+					'</div>',
+				'</div>',
+				'<div class="ft"></div>',
+			'</div>'
 		].join("")
 	};
 	

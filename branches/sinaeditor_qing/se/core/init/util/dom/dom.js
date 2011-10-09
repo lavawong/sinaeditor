@@ -195,8 +195,8 @@ SinaEditor.pkg('SinaEditor.util.dom',function(ns) {
 	 * 获取离最近块状父元素最近的非块状父元素。
 	 * @name SinaEditor.util.dom.getBlockParent
 	 * @function 
-	 * @param {Elment} dom 待传入的节点 
-	 * @return {Elment} 举例如:
+	 * @param {Elment} dom 待传入的节点
+	 * @param {Boolean} goBody 待传入的节点 
 	 * @return {Elment} 举例如:
 	 * &nbsp;&nbsp;&nbsp;&nbsp; (a)&lt;div&gt;
 	 * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;div&gt;
@@ -211,13 +211,22 @@ SinaEditor.pkg('SinaEditor.util.dom',function(ns) {
 	 * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/div&gt;
 	 * &nbsp;&nbsp;&nbsp;&nbsp; &lt;/div&gt;,传入的节点是a标签,由于父节点就是块状元素,将会返回null;
 	 */
-	ns.getBlockParent = function(dom) {
+	ns.getBlockParent = function(dom,goBody) {
 		var ps = ns.parents(dom);
 		var blockElm = null;
 		var i;
 		for(i=0; ps[i]; i++) {
 			if(SinaEditor.RANGE.BLOCKTAGS[ps[i].tagName.toUpperCase()]) {
-				break;
+				if(goBody) {
+					var pp = ps[i+1];
+					if(pp && pp.tagName && pp.tagName.toUpperCase() === 'BODY') {
+						break;
+					} else if(ps[i].tagName.toUpperCase() === 'BODY') {
+						break;
+					}
+				} else {
+					break;
+				}
 			}
 			blockElm = ps[i];
 		}

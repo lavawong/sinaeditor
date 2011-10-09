@@ -82,6 +82,11 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			return range;	
 		}
 		
+		//由于ieRange出现定位不准的问题，这个就是整行选取失败的原因
+		//if(range._range) {
+		//	return;
+		//}
+		
 		var tmpRange = range.cloneRange();
 		var oldStart = range.startContainer;
 		var newStart = _whichOne(oldStart);
@@ -399,19 +404,19 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			return;
 		}
 
-		var marks = _createBookmark(editor, {
+		var marks = ns.createBookmark(editor, {
             'range': range
         });
 		
 		//拆分块状元素，判断放在了函数里
         if(marks.end){
-			marks.end = _breakParent.call(editor, marks.end);
+			marks.end = ns.breakParent.call(editor, marks.end);
 		}
-        marks.start = _breakParent.call(editor, marks.start);
+        marks.start = ns.breakParent.call(editor, marks.start);
 		
         //if (range.toString()) {
             //在多行情况下，firefox有可能会选上结尾的br节点
-            _getNextNode(marks.start, marks.end, function(currEle){
+            ns.travelNodes(marks.start, marks.end, function(currEle){
                 if (currEle.nodeType == 3 && currEle.data) {
                     currEle = _handleTextSelected(editor, currEle, {
 						'useTagName': styleConf.useTagName.toUpperCase(),
@@ -529,7 +534,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			editor.focus();
             return;
         }
-        var marks = _createBookmark(editor, {
+        var marks = ns.createBookmark(editor, {
             'range': range
         });
         
@@ -540,11 +545,11 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 			
 			if(!noBreak) {
 				//拆分块状元素，判断放在了函数里
-                marks.end = _breakParent.call(editor, marks.end);
-                marks.start = _breakParent.call(editor, marks.start);
+                marks.end = ns.breakParent.call(editor, marks.end);
+                marks.start = ns.breakParent.call(editor, marks.start);
 			}
             
-            _getNextNode(marks.start, marks.end, function(currEle){
+            ns.travelNodes(marks.start, marks.end, function(currEle){
                 //如果是对应的节点
                 if (currEle.nodeType === SinaEditor.NODETYPE.ELEMENT 
 						&& refTags[currEle.tagName.toUpperCase()]) {
@@ -580,8 +585,8 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      * @param {Object} end 结束节点，BOOKMARK的结束点
      * @param {Function} func 回调函数
      */
-    var _getNextNode = function(begin, end, callBack){
-        var current = __getNextElement(begin, true);
+	ns.travelNodes = function(begin, end, callBack) {
+		var current = __getNextElement(begin, true);
 		//debugger;
         while (current && current != end) {
             //保留第一个元素，当它被摧毁时(如删除这个标签)，可以依然找到下一个节点
@@ -591,7 +596,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
 				callBack(handleEle);
 			}
         }
-    };
+	};
     
     /**
      * 获得下一个可用的节点
@@ -631,7 +636,7 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      * @param {Object} opts
      * @return {Object} start : 开始位置 end : 结束位置
      */
-    var _createBookmark = function(editor, opts){
+    ns.createBookmark = function(editor, opts){
         opts = opts || {};
         var spanHead,
 			spanEnd,
@@ -724,11 +729,12 @@ SinaEditor.pkg('SinaEditor.range', function(ns){
      * 自己是非块级元素，父元素也是非块级元素,那么就得把它拆开,修改自：
      * CKEDITOR.dom.element.breakParent方法.
      * @param {Object} child 子节点,以它作为标杆，一般是标签节点
+     * @param {Boolean} goBody 待传入的节点 
      * @return {Boolean} 是否进行了移除操作.
      */
-    var _breakParent = function(child){
+    ns.breakParent = function(child,goBody){
     
-        var parent = domUtil.getBlockParent(child);
+        var parent = domUtil.getBlockParent(child,goBody);
         if (!parent) {
             //父元素就是块状元素，没有必要拆分
             return child;

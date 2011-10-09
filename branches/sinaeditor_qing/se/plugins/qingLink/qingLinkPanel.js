@@ -73,7 +73,19 @@ SinaEditor.plugins.add('qingLinkPanel',function(args){
                 },
 				'blur': function(){
 					this.className = '';
-                }
+                },
+				'keydown':function(e){
+					var which = e.which || e.keyCode || e.charCode;
+					if(which === 13) {
+						if(hiddNode.style.display !== '') {
+							SinaEditor.ev.stopEvent(e);
+							SinaEditor.ev.fire(okNode,'click');
+							return false;
+						} else {
+							textNode.focus();
+						}
+					}
+				}
             }
 		},{
 			"element": textNode,
@@ -83,7 +95,15 @@ SinaEditor.plugins.add('qingLinkPanel',function(args){
                 },
 				'blur': function(){
 					this.className = '';
-                }
+                },
+				'keydown':function(e){
+					var which = e.which || e.keyCode || e.charCode;
+					if(which === 13) {
+						SinaEditor.ev.stopEvent(e);
+						SinaEditor.ev.fire(okNode,'click');
+						return false;
+					}
+				}
             }
 		}]
     };
